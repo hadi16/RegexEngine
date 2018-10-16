@@ -38,7 +38,8 @@ class RegexValidator:
                 else:
                     return False
             elif stack[-1].isalnum():
-                if regex_character == RegexSpecialChar.RANGE_CENTER.value:pass
+                if regex_character == RegexSpecialChar.RANGE_CENTER.value:
+                    pass
 
         if stack == ['$']:
             return True
