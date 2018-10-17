@@ -1,26 +1,26 @@
 from nfa.node import Node
-from regexspecialchar import RegexOperator
-from typing import Dict, List
+from regexspecialchar import RegexSpecialChar
 
 
 class Transformation:
-    def _optional(self, nfa: Dict[str, List[Node]]) -> Dict[str, List[Node]]:
+    def _optional(self, nfa: Node) -> Node:
         pass
 
-    def _plus(self, nfa: Dict[str, List[Node]]) -> Dict[str, List[Node]]:
+    def _plus(self, nfa: Node) -> Node:
         pass
 
-    def _star(self, nfa: Dict[str, List[Node]]) -> Dict[str, List[Node]]:
+    def _star(self, nfa: Node) -> Node:
         pass
 
-    def _union(self, nfa: Dict[str, List[Node]]) -> Dict[str, List[Node]]:
+    def _union(self, nfa_a: Node, nfa_b: Node) -> Node:
         pass
 
-    def perform_regex_operation(self, operator: RegexOperator) -> Dict[str, List[Node]]:
-        regex_transformation_operator_func: Dict[RegexOperator, function] = {
-            RegexOperator.OPTIONAL:  self._optional,
-            RegexOperator.PLUS:      self._plus,
-            RegexOperator.STAR:      self._star,
-            RegexOperator.UNION:     self._union
-        }
-        return regex_transformation_operator_func.get(operator)()
+    def perform_regex_operation(self, operator: RegexSpecialChar, nfa_a: Node, nfa_b: Node=None) -> Node:
+        if operator == RegexSpecialChar.OPTIONAL:
+            return self._optional(nfa_a)
+        elif operator == RegexSpecialChar.PLUS:
+            return self._plus(nfa_a)
+        elif operator == RegexSpecialChar.STAR:
+            return self._star(nfa_a)
+        elif operator == RegexSpecialChar.UNION:
+            return self._union(nfa_a, nfa_b)
