@@ -3,6 +3,9 @@ from regexspecialchar import RegexSpecialChar
 
 
 class Transformation:
+    def _concatenation(self, nfa_a: Node, nfa_b: Node) -> Node:
+        pass
+
     def _optional(self, nfa: Node) -> Node:
         pass
 
@@ -26,3 +29,5 @@ class Transformation:
             return self._star(nfa_a)
         elif operator == RegexSpecialChar.UNION:
             return self._union(nfa_a, nfa_b)
+        elif operator == RegexSpecialChar.CONCATENATION:
+            return self._concatenation(nfa_a, nfa_b)

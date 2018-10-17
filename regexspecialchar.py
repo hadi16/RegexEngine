@@ -3,6 +3,7 @@ from typing import List
 
 
 class RegexSpecialChar(Enum):
+    CONCATENATION = '·'
     STAR = '*'
     UNION = '|'
     PLUS = '+'
