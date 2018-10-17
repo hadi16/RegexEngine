@@ -5,7 +5,7 @@ from typing import List
 
 class JsonReader:
     def __init__(self, input_file: str):
-        self._regex_input_list = self._read_json_input_file(input_file)
+        self.regex_input_list = self._read_json_input_file(input_file)
 
     def _read_json_input_file(self, input_file_path: str) -> List[RegexResult]:
         result_list: List[RegexResult] = []
@@ -31,7 +31,3 @@ class JsonReader:
                 result_list.append(RegexResult(regular_expression, test_strings))
 
         return result_list
-
-    @property
-    def regex_input_list(self) -> List[RegexResult]:
-        return self._regex_input_list

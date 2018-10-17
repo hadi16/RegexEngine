@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List
 
 
-class RegexSpecialChar(Enum):
+class RegexChar(Enum):
     CONCATENATION = '·'
     STAR = '*'
     UNION = '|'
@@ -12,5 +12,5 @@ class RegexSpecialChar(Enum):
     RANGE = '[-]'
 
     @staticmethod
-    def all_regex_special_chars() -> List[str]:
-        return [item.value for item in RegexSpecialChar]
+    def all_regex_chars() -> List[str]:
+        return [item.value for item in RegexChar]
