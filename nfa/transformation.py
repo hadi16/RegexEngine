@@ -7,13 +7,15 @@ class Transformation:
         pass
 
     def _plus(self, nfa: Node) -> Node:
-        pass
+        return self._union(nfa, self._star(nfa))
 
     def _star(self, nfa: Node) -> Node:
         pass
 
     def _union(self, nfa_a: Node, nfa_b: Node) -> Node:
-        pass
+        return Node(False, {
+            "": [nfa_a, nfa_b]
+        })
 
     def perform_regex_operation(self, operator: RegexSpecialChar, nfa_a: Node, nfa_b: Node=None) -> Node:
         if operator == RegexSpecialChar.OPTIONAL:
