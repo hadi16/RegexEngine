@@ -29,7 +29,7 @@ class Transformation:
         accepting_nodes = nfa_a.accepting_nodes + nfa_b.accepting_nodes
         return Nfa(initial_node, accepting_nodes)
 
-    def perform_regex_operation(self, operator: RegexChar, nfa_a: Nfa, nfa_b: Nfa=None) -> Nfa:
+    def transform_nfa(self, operator: RegexChar, nfa_a: Nfa, nfa_b: Nfa=None) -> Nfa:
         if operator == RegexChar.OPTIONAL:
             return self._optional(nfa_a)
         elif operator == RegexChar.PLUS:
