@@ -19,13 +19,21 @@ class Transformation:
         return self._union(nfa, self._star(nfa))
 
     def _star(self, nfa: Nfa) -> Nfa:
-        pass
+        for accepting_node in nfa.accepting_nodes:
+            if '' in accepting_node.transitions:
+                accepting_node.transitions[''].append(nfa.initial_node)
+            else:
+                accepting_node.transitions[''] = [nfa.initial_node]
+        new_initial_node = Node({
+            '': [nfa.initial_node]
+        })
+        nfa.accepting_nodes.append(new_initial_node)
+        return Nfa(new_initial_node, nfa.accepting_nodes)
 
     def _union(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
-        initial_node = Node(
-            {
-                '': [nfa_a.initial_node, nfa_b.initial_node]
-            })
+        initial_node = Node({
+            '': [nfa_a.initial_node, nfa_b.initial_node]
+        })
         accepting_nodes = nfa_a.accepting_nodes + nfa_b.accepting_nodes
         return Nfa(initial_node, accepting_nodes)
 
