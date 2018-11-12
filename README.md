@@ -14,12 +14,12 @@ Users must have 'click' installed (for help with the command line portion of the
 STEPS TO RUN & EXPECTED OUTPUT
 1. Clone the project.
 2. Navigate to the RegexEngine folder.
-3. To run in regular mode, enter: "python RegexEngine -r testPattern testStr"
+3. To run in regular mode, enter: "python RegexEngine -r testPattern -s testStr"
   - testPattern : The regular expression you wish to test against.
   - testStr : The string to be checked against the given regular expression.
   - EXPECTED OUTPUT: A line of text output to the terminal structured as follows:
       "The string 'testStr' is accepted/not accepted by the regular expression 'testPattern.'"
-4. To run in batch mode, enter: "python RegexEngine -b inFile.json outFile.json"
+4. To run in batch mode, enter: "python RegexEngine -i inFile.json -o outFile.json"
   - inFile.json : a json file containing regular expressions and test strings formatting as follows:
   [
     {
