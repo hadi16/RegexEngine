@@ -3,7 +3,8 @@ from typing import List
 
 
 class RegexChar(Enum):
-    CONCATENATION = '·'
+    CONCATENATION = ['a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2',
+    '3', '4', '5', '6', '7', '8', '9'] # note string.isalnum() may be alternative
     STAR = '*'
     UNION = '|'
     PLUS = '+'

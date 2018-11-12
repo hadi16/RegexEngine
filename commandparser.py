@@ -64,7 +64,8 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
 def regular_mode(regex: str, test_strings: Tuple[str]):
     # Build the result of the regular expression
     regex_result = RegexResult(regex, list(test_strings))
-    # TODO: Add regex transformation.
+    # Process the regex on the test string(s).
+    regex_result.runTests()
     # output the result for each test string
     for test_string in test_strings:
         click.echo("'{}' accepted by regular expression '{}': {}"
