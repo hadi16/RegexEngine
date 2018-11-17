@@ -24,6 +24,8 @@ class RegexResult:
         # build equivalent NFA
         t = Transform()
         nfa_model = t.transform_to_NFA(self.regular_expression)
+        print(t.openGroups)
+        print(nfa_model.states)
         if nfa_model is None:
             print('Error transforming the NFA!')
             return
@@ -31,4 +33,4 @@ class RegexResult:
         # run tests on NFA
         for test in self.test_strings_in_language.keys():
             print('testing: ', test)
-            self.test_strings_in_language[test] = nfa_model.run_NFA(nfa_model, test)
+            self.test_strings_in_language[test] = nfa_model.run_NFA(test)

@@ -1,5 +1,5 @@
 from nfa import NFA
-
+from regexchar import RegexChar
 
 ##
 #
@@ -46,9 +46,12 @@ class Transform:
         for c in regex:
 
             # check if it is a group
-            if c == RegexChar.GROUP or c == RegexChar.RANGE:
-                # TODO : check for closed states
-                self.openGroups.append(self.lastState)
+            if c in RegexChar.GROUP.value or c in RegexChar.RANGE.value:
+                if c == '(' or c == '[':
+                    self.openGroups.append(self.lastState) # TODO : test not causing errors
+                else:
+                    # close the group
+                    self.lastClosedGroup = self.openGroups[-1]
             # check if it is an operator
             elif c == RegexChar.PLUS or c == RegexChar.STAR or c == RegexChar.UNION or c == RegexChar.OPTIONAL:
                 # apply the operator to the last closed group
@@ -56,12 +59,10 @@ class Transform:
                     # error in regex
                     return None
                 else:
+                    if c == RegexChar.UNION:
+                        self._union(nfa)
                     # apply
                     pass # TODO
-            # check if it is a group
-            elif c == RegexChar.GROUP or c == RegexChar.RANGE:
-                # TODO : check for closed states
-                self.openGroups.append(self.lastState)
             # build the state
             else:
                 # if alphanumeric, concatenate
@@ -94,6 +95,22 @@ class Transform:
         self.lastState = nfa.addNormalChar(self.lastState, concat_char, True)
 
         return nfa
+
+    ##
+    # Description: concatenate a regex char to existing NFA.
+    #
+    # Parameters:
+    #   nfa: the existing NFA.
+    #   concat_char: character from regex to concatenate.
+    #
+    # Return: The resulting NFA.
+    ##
+    def _union(self, nfa_a: NFA) -> NFA:
+        # if my open group is at the initial state, make a new state
+
+        # otherwise, connect a new epsilon path out of the open group state for the
+        # other part of the union
+        pass
 
     # def _concatenation(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
     #     for nfa_a_accepting_node in nfa_a.accepting_nodes:
