@@ -53,14 +53,17 @@ class Transform:
                     # close the group
                     self.lastClosedGroup = self.openGroups[-1]
             # check if it is an operator
-            elif c == RegexChar.PLUS or c == RegexChar.STAR or c == RegexChar.UNION or c == RegexChar.OPTIONAL:
+            elif c == RegexChar.PLUS.value or c == RegexChar.STAR.value or c == RegexChar.UNION.value or c == RegexChar.OPTIONAL.value:
+                print("i found operator")
+                if c == RegexChar.UNION.value:
+                    self._union(nfa)
                 # apply the operator to the last closed group
-                if self.lastClosedGroup == None:
+                if self.lastClosedGroup is None:
                     # error in regex
+                    print('operator error')
                     return None
                 else:
-                    if c == RegexChar.UNION:
-                        self._union(nfa)
+
                     # apply
                     pass # TODO
             # build the state
@@ -70,6 +73,7 @@ class Transform:
                     nfa = self._concatenation(nfa, c)
                 else:
                     # error
+                    print('character error')
                     return None
         return nfa
 
@@ -105,12 +109,16 @@ class Transform:
     #
     # Return: The resulting NFA.
     ##
-    def _union(self, nfa_a: NFA) -> NFA:
+    def _union(self, nfa: NFA) -> NFA:
         # if my open group is at the initial state, make a new state
-
+        if self.openGroups[-1] == nfa.initial_state:
+            print('here')
+            self.lastState = nfa.replaceInitial()
         # otherwise, connect a new epsilon path out of the open group state for the
         # other part of the union
-        pass
+        else :
+            pass
+            # self.lastState = nfa.addEpsilonConnector()
 
     # def _concatenation(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
     #     for nfa_a_accepting_node in nfa_a.accepting_nodes:

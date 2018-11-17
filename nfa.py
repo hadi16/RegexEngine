@@ -25,7 +25,7 @@ class NFA:
         self.accepting_states = []
         self.alphabet: Set[str] = set()
         self.states = []
-        self.transition_function = {}  # structure: {(state, char) => state}
+        self.transition_function = {}  # structure: {(state, char) => [state]}
 
     ##
     # initialize
@@ -40,6 +40,12 @@ class NFA:
         initial_state = State(len(self.states))
         self.states.append(initial_state)
         self.initial_state = initial_state
+
+    def add_to_transition(self, transition, state):
+        if transition in self.transition_function:
+            self.transition_function[transition].append(state)
+        else:
+            self.transition_function[transition] = [state]
 
     ##
     # addNormalChar
@@ -64,7 +70,7 @@ class NFA:
             self.accepting_states = [new_state] # TODO currently overwrites old
             # accept states. Will need to change when functions other than concatenation are supported.
         # add transition from old_state to new_state
-        self.transition_function[(old_state, transition_char)] = new_state
+        self.add_to_transition((old_state, transition_char), new_state)
 
         return new_state
 
@@ -82,6 +88,30 @@ class NFA:
     ##
     def addEpsilonConnector(self, old_state):
         return self.addNormalChar(old_state, EPSILON, False)
+
+
+    ##
+    # replaceInitial
+    #
+    # Description: Add necessary states and transitions to connect one state to
+    # a new one on epsilon. Invariants: state is in self.states(). New state will
+    # not be accepting.
+    #
+    #
+    # Return : the state representing the final state of this sequence.
+    ##
+    def replaceInitial(self):
+        # make a state
+        new_state = State(len(self.states))
+        self.states.append(new_state)
+
+        # epsilon the state to initial
+        self.transition_function[(new_state, EPSILON)] = self.initial_state
+
+        # replace initial
+        self.initial_state = new_state
+
+        return new_state
 
     ##
     #

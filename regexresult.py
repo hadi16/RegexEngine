@@ -26,6 +26,8 @@ class RegexResult:
         nfa_model = t.transform_to_NFA(self.regular_expression)
         print(t.openGroups)
         print(nfa_model.states)
+        print(nfa_model.initial_state)
+        print(nfa_model.transition_function)
         if nfa_model is None:
             print('Error transforming the NFA!')
             return
