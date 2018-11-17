@@ -9,6 +9,8 @@ class Transform:
 
     def __init__(self):
         self.lastState = None
+        self.openGroups = []
+        self.lastClosedGroup = None
     ##
     # Description: main entry point to convert regex to NFA by parsing through the regex
     #
@@ -25,7 +27,6 @@ class Transform:
         alphabet = []
 
         for c in regex:
-            # if c in RegexChar.CONCATENATION:
             if c.isalnum():
                 alphabet.append(c)
         # make an NFA and initialize
@@ -35,6 +36,17 @@ class Transform:
 
         # parse regex
         for c in regex:
+            # check if it is an operator
+            if c == RegexChar.PLUS or c == RegexChar.STAR or c == RegexChar.UNION
+                or c == RegexChar.OPTIONAL or c == RegexChar.GROUP or c == RegexChar.RANGE:
+                # apply the operator to the last closed group
+                if self.lastClosedGroup == None:
+                    # error in regex
+                    return None
+                else:
+                    # apply
+                    pass # TODO
+            # add it as an open group
             # TODO: only supports concatenation
             # if alphanumeric, concatenate
             if c.isalnum():
