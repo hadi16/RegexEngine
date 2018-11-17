@@ -1,10 +1,10 @@
 from enum import Enum
+from string import printable
 from typing import List
 
 
 class RegexChar(Enum):
-    CONCATENATION = ['a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2',
-    '3', '4', '5', '6', '7', '8', '9'] # note string.isalnum() may be alternative
+    CONCATENATION = [x for x in printable if x.isalnum()]
     STAR = '*'
     UNION = '|'
     PLUS = '+'
@@ -13,5 +13,14 @@ class RegexChar(Enum):
     RANGE = '[-]'
 
     @staticmethod
-    def all_regex_chars() -> List[str]:
-        return [item.value for item in RegexChar]
+    def operators() -> List[str]:
+        return [RegexChar.PLUS.value, RegexChar.STAR.value, RegexChar.UNION.value,
+                RegexChar.OPTIONAL.value]
+
+    @staticmethod
+    def opening_groups() -> List[str]:
+        return [RegexChar.GROUP.value[0], RegexChar.RANGE.value[0]]
+
+    @staticmethod
+    def closing_groups() -> List[str]:
+        return [RegexChar.GROUP.value[-1], RegexChar.RANGE.value[-1]]

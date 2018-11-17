@@ -3,11 +3,12 @@ from regexresult import RegexResult
 from typing import List
 
 
-##
-#
-# Description: Class to read an input json file into a list of RegexResult objects.
-##
 class JsonReader:
+    """
+    JsonReader
+    Class to read an input json file into a list of RegexResult objects.
+    """
+
     def __init__(self, input_file: str):
         self.regex_input_list = self._read_json_input_file(input_file)
 

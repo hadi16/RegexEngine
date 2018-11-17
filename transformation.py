@@ -1,164 +1,112 @@
 from nfa import NFA
 from regexchar import RegexChar
+from state import State
+from typing import List
 
-##
-#
-# Description: Class to transform a regular expression into an equivalent NFA.
+
 class Transform:
-    # constants for identification
+    """
+    Transform
+    Class to transform a regular expression into an equivalent NFA.
+    """
 
     def __init__(self):
-        self.lastState = None
-        self.openGroups = []
-        self.lastClosedGroup = None
-    ##
-    # Description: main entry point to convert regex to NFA by parsing through the regex
-    #
-    # Parameters:
-    #   regex: the regular expression to convert.
-    #
-    # Return: An equivalent NFA.
-    ##
-    def transform_to_NFA(self, regex: str) -> NFA:
+        self.last_state: State = None
+        self.open_groups: List[State] = []
+        self.last_closed_group: State = None
+
+    def transform_to_nfa(self, regex: str) -> NFA:
+        """
+        transform_to_nfa
+        Main entry point to convert regex to NFA by parsing through the regex.
+
+        :param regex: The regular expression to convert.
+        :return: An equivalent NFA.
+        """
+
         if regex is None:
-            return None
+            return
 
-        # build alphabet
-        alphabet = set()
-
-        for c in regex:
-            if c.isalnum():
-                alphabet.add(c)
-        # make an NFA and initialize
+        # Make an NFA and initialize_nfa
         nfa = NFA()
-        nfa.initialize(alphabet)
-        self.lastState = nfa.initial_state
-        self.openGroups.append(self.lastState)
+        nfa.initialize_nfa(regex)
+        self.last_state = nfa.initial_state
+        self.open_groups.append(self.last_state)
 
 
-        # parse regex:
-            # If I read an open grouping char (i.e. '(' or '['), add it as an open group.
-            # If I read a closed grouping char (i.e. ')' or ']'), move the last open state to closed.
-            # If I read an operator, apply the operator to the last closed group. If
-            #   there are no closed groups, there is an error.
-            # If I read a character, process it and set it as the last closed group.
-        #
+
+        # Parse regex:
+        # If I read an open grouping char (i.e. '(' or '['), add it as an open group.
+        # If I read a closed grouping char (i.e. ')' or ']'), move the last open state to closed.
+        # If I read an operator, apply the operator to the last closed group.
+        # If there are no closed groups, there is an error.
+        # If I read a character, process it and set it as the last closed group.
         for c in regex:
-
-            # check if it is a group
-            if c in RegexChar.GROUP.value or c in RegexChar.RANGE.value:
-                if c == '(' or c == '[':
-                    self.openGroups.append(self.lastState) # TODO : test not causing errors
-                else:
-                    # close the group
-                    self.lastClosedGroup = self.openGroups[-1]
+            # Check if it is a group
+            if c in RegexChar.opening_groups():
+                self.open_groups.append(self.last_state)  # TODO : test not causing errors
+            elif c in RegexChar.closing_groups():
+                # close the group
+                self.last_closed_group = self.open_groups[-1]
             # check if it is an operator
-            elif c == RegexChar.PLUS.value or c == RegexChar.STAR.value or c == RegexChar.UNION.value or c == RegexChar.OPTIONAL.value:
-                print("i found operator")
+            elif c in RegexChar.operators():
                 if c == RegexChar.UNION.value:
-                    self._union(nfa)
-                # apply the operator to the last closed group
-                if self.lastClosedGroup is None:
-                    # error in regex
-                    print('operator error')
-                    return None
-                else:
+                    self.union_nfa(nfa)
 
+                # apply the operator to the last closed group
+                if self.last_closed_group is None:
+                    # Error in regex
+                    print('Operator Error!')
+                    return
+                else:
                     # apply
-                    pass # TODO
+                    pass  # TODO
             # build the state
             else:
                 # if alphanumeric, concatenate
                 if c.isalnum():
-                    nfa = self._concatenation(nfa, c)
+                    nfa = self.concatenate_nfa(nfa, c)
                 else:
                     # error
                     print('character error')
-                    return None
+                    return
         return nfa
 
-    ##
-    # Description: concatenate a regex char to existing NFA.
-    #
-    # Parameters:
-    #   nfa: the existing NFA.
-    #   concat_char: character from regex to concatenate.
-    #
-    # Return: The resulting NFA.
-    ##
-    def _concatenation(self, nfa: NFA, concat_char: str) -> NFA:
+    def concatenate_nfa(self, nfa: NFA, concat_char: str) -> NFA:
+        """
+        concatenate_nfa
+        Concatenate a regex char to an existing NFA.
+
+        :param nfa: The existing NFA.
+        :param concat_char: Character from regex to concatenate.
+        :return: The resulting NFA.
+        """
         # As states are added, update the last state to connect from
         # if this isn't the first char of the regex (only a start state), add an epsilon transition.
         if len(nfa.states) > 1:
-            self.lastState = nfa.addEpsilonConnector(self.lastState)
+            self.last_state = nfa.add_epsilon_connector(self.last_state)
 
         # add the last state as an last close group
-        self.lastClosedGroup = self.lastState
+        self.last_closed_group = self.last_state
 
         # Connect to to new state on concat_char
-        self.lastState = nfa.addNormalChar(self.lastState, concat_char, True)
+        self.last_state = nfa.add_normal_char(self.last_state, concat_char, True)
 
         return nfa
 
-    ##
-    # Description: add a union from the last open group (or initial state) to existing NFA.
-    #
-    # Parameters:
-    #   nfa: the existing NFA.
-    #
-    # Return: The resulting NFA.
-    ##
-    def _union(self, nfa: NFA) -> NFA:
+    def union_nfa(self, nfa: NFA) -> None:
+        """
+        union_nfa
+        Add a union from the last open group (or initial state) to existing NFA.
+
+        :param nfa: The existing NFA.
+        :return: The resulting NFA.
+        """
+
         # if my open group is at the initial state, make a new state
-        if self.openGroups[-1] == nfa.initial_state:
-            print('here')
-            self.lastState = nfa.replaceInitial()
+        if self.open_groups[-1] == nfa.initial_state:
+            self.last_state = nfa.replace_initial()
         # otherwise, connect a new epsilon path out of the open group state for the
         # other part of the union
         else:
-            self.lastState = nfa.addEpsilonConnector(self.openGroups[-1])
-
-    # def _concatenation(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
-    #     for nfa_a_accepting_node in nfa_a.accepting_nodes:
-    #         if '' in nfa_a_accepting_node.transitions:
-    #             nfa_a_accepting_node.transitions[''].append(nfa_b.initial_node)
-    #         else:
-    #             nfa_a_accepting_node.transitions[''] = [nfa_b.initial_node]
-    #     return Nfa(nfa_a.initial_node, nfa_b.accepting_nodes)
-
-    # def _optional(self, nfa: Nfa) -> Nfa:
-    #     pass
-    #
-    # def _plus(self, nfa: Nfa) -> Nfa:
-    #     return self._union(nfa, self._star(nfa))
-    #
-    # def _star(self, nfa: Nfa) -> Nfa:
-    #     for accepting_node in nfa.accepting_nodes:
-    #         if '' in accepting_node.transitions:
-    #             accepting_node.transitions[''].append(nfa.initial_node)
-    #         else:
-    #             accepting_node.transitions[''] = [nfa.initial_node]
-    #     new_initial_node = Node({
-    #         '': [nfa.initial_node]
-    #     })
-    #     nfa.accepting_nodes.append(new_initial_node)
-    #     return Nfa(new_initial_node, nfa.accepting_nodes)
-    #
-    # def _union(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
-    #     initial_node = Node({
-    #         '': [nfa_a.initial_node, nfa_b.initial_node]
-    #     })
-    #     accepting_nodes = nfa_a.accepting_nodes + nfa_b.accepting_nodes
-    #     return Nfa(initial_node, accepting_nodes)
-    #
-    # def transform_nfa(self, operator: RegexChar, nfa_a: Nfa, nfa_b: Nfa=None) -> Nfa:
-    #     if operator == RegexChar.OPTIONAL:
-    #         return self._optional(nfa_a)
-    #     elif operator == RegexChar.PLUS:
-    #         return self._plus(nfa_a)
-    #     elif operator == RegexChar.STAR:
-    #         return self._star(nfa_a)
-    #     elif operator == RegexChar.UNION:
-    #         return self._union(nfa_a, nfa_b)
-    #     elif operator == RegexChar.CONCATENATION:
-    #         return self._concatenation(nfa_a, nfa_b)
+            self.last_state = nfa.add_epsilon_connector(self.open_groups[-1])
