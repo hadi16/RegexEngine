@@ -22,5 +22,5 @@ class JsonWriter:
                 "strings":  regex_result.test_strings_in_language
             })
 
-        with open('w', self._output_file_path) as file:
+        with open(self._output_file_path, 'w') as file:
             file.write(json.dumps(json_list))

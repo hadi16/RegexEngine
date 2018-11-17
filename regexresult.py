@@ -24,6 +24,9 @@ class RegexResult:
         # build equivalent NFA
         t = Transform()
         nfa_model = t.transform_to_NFA(self.regular_expression)
+        if nfa_model is None:
+            print('Error transforming the NFA!')
+            return
 
         # run tests on NFA
         for test in self.test_strings_in_language.keys():
