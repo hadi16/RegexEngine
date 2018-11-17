@@ -1,4 +1,4 @@
-from typing import Set
+from typing import List, Dict, Set
 
 # constant to define 'epsilon'
 EPSILON = 0
@@ -25,7 +25,7 @@ class NFA:
         self.accepting_states = []
         self.alphabet: Set[str] = set()
         self.states = []
-        self.transition_function = {}  # structure: {(state, char) => [state]}
+        self.transition_function: Dict[(State, str), List[State]] = {}  # structure: {(state, char) => [state]}
 
     ##
     # initialize
@@ -106,7 +106,7 @@ class NFA:
         self.states.append(new_state)
 
         # epsilon the state to initial
-        self.transition_function[(new_state, EPSILON)] = self.initial_state
+        self.add_to_transition((new_state, EPSILON), self.initial_state)
 
         # replace initial
         self.initial_state = new_state
