@@ -105,53 +105,44 @@ class NFA:
 
         return new_state
 
-    def run_nfa(self, input_string: str) -> bool:
+    def run_nfa(self, input_string: str, start_state) -> bool:
         """
         run_nfa
         Run a string through an NFA.
+        Always reads epsilon transitions after reading a character.
 
         :param input_string: The string to run.
+        :param start_state: The state to start from.
         :return: True if string was accepted. False otherwise.
         """
 
-        # set up the current state
-        current_state = start_state if start_state else self.initial_state
+        # Set up the current state
+        current_state = start_state
         if current_state in self.accepting_states:
             return True
 
-        destination_states = self.transition_function[(current_state, EPSILON)]
-        resulting_states = []
-        for state in destination_states:
-            resulting_states += self.run_nfa(input_string, state)
+        # Finds all resulting states from epsilon transitions.
+        if (current_state, EPSILON) in self.transition_function:
+            destinations = self.transition_function[(current_state, EPSILON)]
+            for dest in destinations:
+                if dest is True:
+                    return True
+                elif dest is False:
+                    continue
+                else:
+                    return self.run_nfa(input_string, dest)
 
+        # Checks if string has been read through.
+        if not input_string:
+            return False
 
-
-        destination_states = self.transition_function[(current_state, input_string[0])]
-
-
-
-
-
-        # process while not rejected and not at end of input string
-        for index, char in enumerate(input_string):
-            # take all epsilon transitions while available
-            while (current_state, EPSILON) in self.transition_function:
-                destination_states = self.transition_function[(current_state, )]
-                accepted = []
-                for state in destination_states:
-                    accepted += self.run_nfa(input_string[index:], state)
-                return True in accepted
-
-
-
-
-
-
-            # check if there is a corresponding transition
-            if not (current_state, c) in self.transition_function.keys():
-                # no corresponding transition, reject
-                return False
-            # follow the transition
-            current_state = self.transition_function[(current_state, c)]
-        # if ended in an accept state, accept
-        return current_state in self.accepting_states
+        # Checks if the transition doesn't exist in the transition function.
+        if (current_state, input_string[0]) in self.transition_function:
+            destinations = self.transition_function[(current_state, input_string[0])]
+            for dest in destinations:
+                if dest is True:
+                    return True
+                elif dest is False:
+                    continue
+                else:
+                    return self.run_nfa(input_string[1:], dest)

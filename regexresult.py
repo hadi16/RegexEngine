@@ -31,4 +31,4 @@ class RegexResult:
         # run tests on NFA
         for test_string in self.test_strings_in_language:
             print('Testing: ', test_string)
-            self.test_strings_in_language[test_string] = nfa_model.run_nfa(test_string)
+            self.test_strings_in_language[test_string] = nfa_model.run_nfa(test_string, nfa_model.initial_state)
