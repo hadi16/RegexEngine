@@ -1,6 +1,7 @@
 import json
 from regexresult import RegexResult
 from typing import List
+import os
 
 ##
 #
@@ -15,7 +16,7 @@ class JsonReader:
         result_list: List[RegexResult] = []
 
         # read file
-        with open('r', input_file_path) as json_file:
+        with open(input_file_path, 'r') as json_file:
             json_regex_objects: List[dict] = json.load(json_file)
 
             # handle errors

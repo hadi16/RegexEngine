@@ -18,7 +18,7 @@ class Transform:
     # Return: An equivalent NFA.
     ##
     def transform_to_NFA(self, regex):
-        if regex == None:
+        if regex is None:
             return None
 
         # build alphabet
