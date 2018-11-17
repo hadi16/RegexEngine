@@ -1,6 +1,6 @@
 from typing import Dict, List
 from transformation import Transform
-from nfa import NFA
+
 
 ##
 # Description: This class defines the results of regex application to a set of strings.

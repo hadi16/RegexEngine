@@ -1,7 +1,7 @@
 import json
 from regexresult import RegexResult
 from typing import List
-import os
+
 
 ##
 #

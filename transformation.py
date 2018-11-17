@@ -1,14 +1,13 @@
-from node import Node
 from nfa import NFA
-from regexchar import RegexChar
+
 
 ##
 #
 # Description: Class to transform a regular expression into an equivalent NFA.
 class Transform:
-
     def __init__(self):
         self.lastState = None
+
     ##
     # Description: main entry point to convert regex to NFA by parsing through the regex
     #
@@ -17,17 +16,17 @@ class Transform:
     #
     # Return: An equivalent NFA.
     ##
-    def transform_to_NFA(self, regex):
+    def transform_to_NFA(self, regex: str) -> NFA:
         if regex is None:
             return None
 
         # build alphabet
-        alphabet = []
+        alphabet = set()
 
         for c in regex:
             # if c in RegexChar.CONCATENATION:
             if c.isalnum():
-                alphabet.append(c)
+                alphabet.add(c)
         # make an NFA and initialize
         nfa = NFA()
         nfa.initialize(alphabet)
@@ -50,7 +49,7 @@ class Transform:
     #
     # Return: The resulting NFA.
     ##
-    def _concatenation(self, nfa, concat_char):
+    def _concatenation(self, nfa: NFA, concat_char: str) -> NFA:
         # As states are added, update the last state to connect from
         # if this isn't the first char of the regex (only a start state), add an epsilon transition.
         if len(nfa.states) > 1:

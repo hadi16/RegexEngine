@@ -1,11 +1,11 @@
 import click
-import os
 
 from jsonreader import JsonReader
 from jsonwriter import JsonWriter
 from mutuallyexclusiveoption import MutuallyExclusiveOption
 from regexresult import RegexResult
 from typing import Tuple
+
 
 # click functions to simplify command line processing
 @click.command()
@@ -58,6 +58,7 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     else:
         raise click.UsageError('Illegal usage: must provide two command line arguments.')
 
+
 ##
 # regular_mode
 #
@@ -72,6 +73,7 @@ def regular_mode(regex: str, test_strings: Tuple[str]):
     for test_string in test_strings:
         click.echo("'{}' accepted by regular expression '{}': {}"
                    .format(test_string, regex, regex_result.test_strings_in_language[test_string]))
+
 
 ##
 # batch_mode
