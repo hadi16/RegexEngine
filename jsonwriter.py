@@ -2,6 +2,7 @@ import json
 from regexresult import RegexResult
 from typing import List
 
+
 ##
 #
 # Description: Class to write a list of RegexResult objects to the file path output_file_path.
