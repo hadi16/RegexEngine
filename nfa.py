@@ -41,6 +41,15 @@ class NFA:
         self.states.append(initial_state)
         self.initial_state = initial_state
 
+    ##
+    # add_to_transition
+    #
+    # Description: Insert a new transiton to a state
+    #
+    # Parameters:
+    #   transition: tuple of state and input char
+    #   state: ending state of the transition
+    ##
     def add_to_transition(self, transition, state):
         if transition in self.transition_function:
             self.transition_function[transition].append(state)
@@ -93,12 +102,10 @@ class NFA:
     ##
     # replaceInitial
     #
-    # Description: Add necessary states and transitions to connect one state to
-    # a new one on epsilon. Invariants: state is in self.states(). New state will
-    # not be accepting.
+    # Description: build a new initial state and epsilon transiton to old one
     #
     #
-    # Return : the state representing the final state of this sequence.
+    # Return : the enw initial state
     ##
     def replaceInitial(self):
         # make a state
@@ -125,8 +132,10 @@ class NFA:
         # process while not rejected and not at end of input string
         for c in input_string:
             # take all epsilon transitions while available
-            while (current_state, EPSILON) in self.transition_function.keys():
+            while (current_state, EPSILON) in self.transition_function:
                 # take it
+                destinations = self.transition_function[(current_state, EPSILON)]
+
                 current_state = self.transition_function[(current_state, EPSILON)]
 
             # check if there is a corresponding transition

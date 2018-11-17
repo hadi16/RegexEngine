@@ -101,11 +101,10 @@ class Transform:
         return nfa
 
     ##
-    # Description: concatenate a regex char to existing NFA.
+    # Description: add a union from the last open group (or initial state) to existing NFA.
     #
     # Parameters:
     #   nfa: the existing NFA.
-    #   concat_char: character from regex to concatenate.
     #
     # Return: The resulting NFA.
     ##
@@ -116,9 +115,8 @@ class Transform:
             self.lastState = nfa.replaceInitial()
         # otherwise, connect a new epsilon path out of the open group state for the
         # other part of the union
-        else :
-            pass
-            # self.lastState = nfa.addEpsilonConnector()
+        else:
+            self.lastState = nfa.addEpsilonConnector(self.openGroups[-1])
 
     # def _concatenation(self, nfa_a: Nfa, nfa_b: Nfa) -> Nfa:
     #     for nfa_a_accepting_node in nfa_a.accepting_nodes:
