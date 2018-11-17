@@ -1,0 +1,17 @@
+[
+  {
+    "regex": "ab",
+    "strings": [
+        "ab",
+        "abab",
+        "aaaaab"
+     ]
+  },
+  {
+    "regex": "abc0",
+    "strings": [
+        "abc0",
+        "ab"
+    ]
+  }
+]

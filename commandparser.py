@@ -79,7 +79,8 @@ def regular_mode(regex: str, test_strings: Tuple[str]):
 def batch_mode(input_file_path: str, output_file_path: str):
     # read the input file
     regex_result_list = JsonReader(input_file_path).regex_input_list
-    # TODO: Add regex transformation.
+    for test in regex_result_list:
+        test.runTests()
     # Write results to the output_file_path
     json_writer = JsonWriter(output_file_path, regex_result_list)
     json_writer.write_to_json_file()
