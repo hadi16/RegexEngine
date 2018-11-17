@@ -6,6 +6,7 @@ from regexchar import RegexChar
 #
 # Description: Class to transform a regular expression into an equivalent NFA.
 class Transform:
+    # constants for identification
 
     def __init__(self):
         self.lastState = None
@@ -33,12 +34,24 @@ class Transform:
         nfa = NFA()
         nfa.initialize(alphabet)
         self.lastState = nfa.initial_state
+        self.openGroups.append(self.lastState)
 
-        # parse regex
+
+        # parse regex:
+            # If I read an open grouping char (i.e. '(' or '['), add it as an open group.
+            # If I read a closed grouping char (i.e. ')' or ']'), move the last open state to closed.
+            # If I read an operator, apply the operator to the last closed group. If
+            #   there are no closed groups, there is an error.
+            # If I read a character, process it and set it as the last closed group.
+        #
         for c in regex:
+
+            # check if it is a group
+            if c == RegexChar.GROUP or c == RegexChar.RANGE:
+                # TODO : check for closed states
+                self.openGroups.append(self.lastState)
             # check if it is an operator
-            if c == RegexChar.PLUS or c == RegexChar.STAR or c == RegexChar.UNION
-                or c == RegexChar.OPTIONAL or c == RegexChar.GROUP or c == RegexChar.RANGE:
+            elif c == RegexChar.PLUS or c == RegexChar.STAR or c == RegexChar.UNION or c == RegexChar.OPTIONAL:
                 # apply the operator to the last closed group
                 if self.lastClosedGroup == None:
                     # error in regex
@@ -46,11 +59,18 @@ class Transform:
                 else:
                     # apply
                     pass # TODO
-            # add it as an open group
-            # TODO: only supports concatenation
-            # if alphanumeric, concatenate
-            if c.isalnum():
-                nfa = self._concatenation(nfa, c)
+            # check if it is a group
+            elif c == RegexChar.GROUP or c == RegexChar.RANGE:
+                # TODO : check for closed states
+                self.openGroups.append(self.lastState)
+            # build the state
+            else:
+                # if alphanumeric, concatenate
+                if c.isalnum():
+                    nfa = self._concatenation(nfa, c)
+                else:
+                    # error
+                    return None
         return nfa
 
     ##
@@ -67,6 +87,9 @@ class Transform:
         # if this isn't the first char of the regex (only a start state), add an epsilon transition.
         if len(nfa.states) > 1:
             self.lastState = nfa.addEpsilonConnector(self.lastState)
+
+        # add the last state as an last close group
+        self.lastClosedGroup = self.lastState
 
         # Connect to to new state on concat_char
         self.lastState = nfa.addNormalChar(self.lastState, concat_char, True)
