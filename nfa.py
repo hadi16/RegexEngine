@@ -12,9 +12,9 @@ class NFA:
 
     def __init__(self):
         self.initial_state: State = None
-        self.accepting_states = []
+        self.accepting_states: List[State] = []
         self.alphabet: List[str] = []
-        self.states = []
+        self.states: List[State] = []
         self.transition_function: Dict[(State, str), List[State]] = {}
 
     def initialize_nfa(self, regex: str) -> None:
