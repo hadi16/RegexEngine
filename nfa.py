@@ -127,22 +127,19 @@ class NFA:
             for dest in destinations:
                 if dest is True:
                     return True
-                elif dest is False:
-                    continue
-                else:
+                elif dest is State:
                     return self.run_nfa(input_string, dest)
 
         # Checks if string has been read through.
         if not input_string:
             return False
 
-        # Checks if the transition doesn't exist in the transition function.
+        # Checks if the transition exists in the transition function.
         if (current_state, input_string[0]) in self.transition_function:
             destinations = self.transition_function[(current_state, input_string[0])]
             for dest in destinations:
                 if dest is True:
                     return True
-                elif dest is False:
-                    continue
-                else:
+                elif dest is State:
                     return self.run_nfa(input_string[1:], dest)
+        return False
