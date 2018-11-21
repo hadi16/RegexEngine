@@ -125,10 +125,11 @@ class NFA:
         if (current_state, EPSILON) in self.transition_function:
             destinations = self.transition_function[(current_state, EPSILON)]
             for dest in destinations:
-                if dest is True:
-                    return True
-                elif dest is State:
-                    return self.run_nfa(input_string, dest)
+                if not dest is None:
+                    results = []
+                    results.append(self.run_nfa(input_string, dest))
+                    if True in results:
+                        return True
 
         # Checks if string has been read through.
         if not input_string:
@@ -138,8 +139,9 @@ class NFA:
         if (current_state, input_string[0]) in self.transition_function:
             destinations = self.transition_function[(current_state, input_string[0])]
             for dest in destinations:
-                if dest is True:
-                    return True
-                elif dest is State:
-                    return self.run_nfa(input_string[1:], dest)
+                if not dest is None:
+                    results = []
+                    results.append(self.run_nfa(input_string[1:], dest))
+                    if True in results:
+                        return True
         return False
