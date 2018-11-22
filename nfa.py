@@ -123,7 +123,8 @@ class NFA:
         # Finds all resulting states from epsilon transitions.
         if (current_state, EPSILON) in self.transition_function:
             destinations = self.transition_function[(current_state, EPSILON)]
-            if True in [self.run_nfa(input_string, dest) for dest in destinations]:
+            results = [self.run_nfa(input_string, destination) for destination in destinations]
+            if True in results:
                 return True
 
         # Checks if string has been read through.
@@ -133,7 +134,8 @@ class NFA:
         # Checks if the transition exists in the transition function.
         if (current_state, input_string[0]) in self.transition_function:
             destinations = self.transition_function[(current_state, input_string[0])]
-            if True in [self.run_nfa(input_string[1:], dest) for dest in destinations]:
+            results = [self.run_nfa(input_string[1:], destination) for destination in destinations]
+            if True in results:
                 return True
 
         return False

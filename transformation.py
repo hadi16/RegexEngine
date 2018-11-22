@@ -70,13 +70,13 @@ class Transform:
                     return
         return nfa
 
-    def concatenate_nfa(self, nfa: NFA, concat_char: str) -> NFA:
+    def concatenate_nfa(self, nfa: NFA, char_to_concatenate: str) -> NFA:
         """
         concatenate_nfa
         Concatenate a regex char to an existing NFA.
 
         :param nfa: The existing NFA.
-        :param concat_char: Character from regex to concatenate.
+        :param char_to_concatenate: Character from regex to concatenate.
         :return: The resulting NFA.
         """
         # As states are added, update the last state to connect from
@@ -88,7 +88,7 @@ class Transform:
         self.last_closed_group = self.last_state
 
         # Connect to to new state on concat_char
-        self.last_state = nfa.add_normal_char(self.last_state, concat_char, True)
+        self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True)
 
         return nfa
 
