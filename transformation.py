@@ -33,8 +33,6 @@ class Transform:
         self.last_state = nfa.initial_state
         self.open_groups.append(self.last_state)
 
-
-
         # Parse regex:
         # If I read an open grouping char (i.e. '(' or '['), add it as an open group.
         # If I read a closed grouping char (i.e. ')' or ']'), move the last open state to closed.

@@ -57,6 +57,7 @@ class NFA:
         :param assume_accept: Whether to assume final state is accepting or not.
         :return: The state representing the final state of this sequence.
         """
+
         # Build a new state to transition to
         new_state = State(len(self.states))
 
@@ -105,31 +106,25 @@ class NFA:
 
         return new_state
 
-    def run_nfa(self, input_string: str, start_state) -> bool:
+    def run_nfa(self, input_string: str, current_state: State) -> bool:
         """
-        run_nfa
+        run_nfa                                  <!-- RECURSIVE -->
         Run a string through an NFA.
-        Always reads epsilon transitions after reading a character.
 
         :param input_string: The string to run.
-        :param start_state: The state to start from.
+        :param current_state: The state to start from.
         :return: True if string was accepted. False otherwise.
         """
 
         # Set up the current state
-        current_state = start_state
         if current_state in self.accepting_states:
             return True
 
         # Finds all resulting states from epsilon transitions.
         if (current_state, EPSILON) in self.transition_function:
             destinations = self.transition_function[(current_state, EPSILON)]
-            for dest in destinations:
-                if not dest is None:
-                    results = []
-                    results.append(self.run_nfa(input_string, dest))
-                    if True in results:
-                        return True
+            if True in [self.run_nfa(input_string, dest) for dest in destinations]:
+                return True
 
         # Checks if string has been read through.
         if not input_string:
@@ -138,10 +133,7 @@ class NFA:
         # Checks if the transition exists in the transition function.
         if (current_state, input_string[0]) in self.transition_function:
             destinations = self.transition_function[(current_state, input_string[0])]
-            for dest in destinations:
-                if not dest is None:
-                    results = []
-                    results.append(self.run_nfa(input_string[1:], dest))
-                    if True in results:
-                        return True
+            if True in [self.run_nfa(input_string[1:], dest) for dest in destinations]:
+                return True
+
         return False

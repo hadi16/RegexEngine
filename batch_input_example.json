@@ -8,10 +8,10 @@
      ]
   },
   {
-    "regex": "abc0",
+    "regex": "ab|a",
     "strings": [
-        "abc0",
-        "ab"
+        "ab",
+        "a"
     ]
   }
 ]
