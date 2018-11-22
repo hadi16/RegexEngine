@@ -19,12 +19,13 @@ class JsonWriter:
         Write self._regex_result_list to self._output_file_path.
         """
 
-        json_list: List[dict] = []
-        for regex_result in self._regex_result_list:
-            json_list.append({
-                "regex":    regex_result.regular_expression,
-                "strings":  regex_result.test_strings_in_language
-            })
+        json_list: List[dict] = [
+            {
+                "regex": regex_result.regular_expression,
+                "strings": regex_result.test_strings_in_language
+            }
+            for regex_result in self._regex_result_list
+        ]
 
         with open(self._output_file_path, 'w') as file:
             file.write(json.dumps(json_list))
