@@ -14,6 +14,7 @@ class Transform:
         self.last_state: State = None
         self.open_groups: List[State] = []
         self.last_closed_group: State = None
+        self.union_in_progress: List[(State, State)] = []
 
     def transform_to_nfa(self, regex: str) -> NFA:
         """
@@ -40,13 +41,17 @@ class Transform:
         # If there are no closed groups, there is an error.
         # If I read a character, process it and set it as the last closed group.
         for c in regex:
+
             # Check if it is a group
             if c in RegexChar.opening_groups():
                 self.open_groups.append(self.last_state)  # TODO : test not causing errors
             elif c in RegexChar.closing_groups():
                 # close the group
                 self.last_closed_group = self.open_groups[-1]
-            # check if it is an operator
+                if len(self.union_in_progress) > 0 and self.union_in_progress[-1][0] == self.open_groups[-1]:
+                    self.close_union(nfa)
+                self.open_groups = self.open_groups[:-1]
+            # check if the char is an operator
             elif c in RegexChar.operators():
                 if c == RegexChar.UNION.value:
                     self.union_nfa(nfa)
@@ -54,7 +59,6 @@ class Transform:
                 # apply the operator to the last closed group
                 if self.last_closed_group is None:
                     # Error in regex
-                    print('Operator Error!')
                     return
                 else:
                     # apply
@@ -66,8 +70,13 @@ class Transform:
                     nfa = self.concatenate_nfa(nfa, c)
                 else:
                     # error
-                    print('character error')
                     return
+
+        # post processing
+        self.last_closed_group = self.open_groups[-1]
+        if len(self.union_in_progress) > 0 and self.union_in_progress[-1][0] == self.open_groups[-1]:
+            self.close_union(nfa)
+        self.open_groups = self.open_groups[:-1]
         return nfa
 
     def concatenate_nfa(self, nfa: NFA, char_to_concatenate: str) -> NFA:
@@ -88,7 +97,10 @@ class Transform:
         self.last_closed_group = self.last_state
 
         # Connect to to new state on concat_char
-        self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True)
+        if len(self.union_in_progress) > 0:
+            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.union_in_progress[-1][1])
+        else:
+            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.open_groups[-1])
 
         return nfa
 
@@ -98,8 +110,12 @@ class Transform:
         Add a union from the last open group (or initial state) to existing NFA.
 
         :param nfa: The existing NFA.
-        :return: The resulting NFA.
         """
+
+        self.union_in_progress.append((self.open_groups[-1], self.last_state))
+
+        if self.open_groups[-1] in nfa.accepting_states:
+            nfa.accepting_states.remove(self.open_groups[-1])
 
         # if my open group is at the initial state, make a new state
         if self.open_groups[-1] == nfa.initial_state:
@@ -108,3 +124,16 @@ class Transform:
         # other part of the union
         else:
             self.last_state = nfa.add_epsilon_connector(self.open_groups[-1])
+
+
+
+    def close_union(self, nfa: NFA) -> None:
+        """
+        close_union
+        Close the last open union by connecting the two halves (from
+        self.union_in_progress and self.last_state) to a new state via epsilon
+        """
+
+        # connect last state of each branch
+        self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])
+        self.union_in_progress = self.union_in_progress[:-1]

@@ -1,0 +1,1 @@
+[{"regex": "ab", "strings": {"ab": true, "abab": false, "aaaaab": false}}, {"regex": "ab|a", "strings": {"ab": true, "a": true}}]

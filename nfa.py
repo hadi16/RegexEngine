@@ -45,7 +45,7 @@ class NFA:
         else:
             self.transition_function[transition] = [state]
 
-    def add_normal_char(self, old_state: State, transition_char: str, assume_accept: bool=True) -> State:
+    def add_normal_char(self, old_state: State, transition_char: str, assume_accept: bool=True, start_path_state: State=None) -> State:
         """
         add_normal_char
         Add necessary states and transitions to connect one state to a new one on some character.
@@ -55,6 +55,7 @@ class NFA:
         :param old_state: The state to transition from.
         :param transition_char: The char to transition on.
         :param assume_accept: Whether to assume final state is accepting or not.
+        :param start_path_state: the start of the path of this state.
         :return: The state representing the final state of this sequence.
         """
 
@@ -64,15 +65,34 @@ class NFA:
         # Add state to states
         self.states.append(new_state)
 
-        # Add state to accepting states
-        # Will need to change when functions other than concatenation are supported.
-        if assume_accept:
-            self.accepting_states = [new_state]  # TODO currently overwrites old
-
         # Add transition from old_state to new_state
         self.add_to_transition_function((old_state, transition_char), new_state)
 
+        # If needed add this to accepting states
+        if assume_accept:
+            self.clear_accept_from_path(start_path_state, new_state)
+            self.accepting_states.append(new_state)
+
         return new_state
+
+    def clear_accept_from_path(self, start_state: State, end_state: State) -> None:
+        """
+        clear_accept_from_path
+
+        Clears the accept states on the path of the current end_state from
+        self.accepting_states.
+
+        :param end_state: The ending state of the path.
+        """
+
+        to_delete = []
+        r = range(start_state.state_id + 1, end_state.state_id)
+        for s in self.accepting_states:
+            if s.state_id in r:
+                to_delete.append(s)
+
+        for d in to_delete:
+            self.accepting_states.remove(d)
 
     def add_epsilon_connector(self, old_state: State) -> State:
         """
@@ -106,6 +126,28 @@ class NFA:
 
         return new_state
 
+    def close_branch(self, path_end_1: State, path_end_2: State) -> State:
+        """
+        close_branch
+
+        Build a new state that connects two end states to a new end state
+        with epsilon transitions.
+
+        :return: The new final state
+        """
+
+        # Makes a new state.
+        new_state = State(len(self.states))
+
+        # epsilon transition from end states
+        self.add_to_transition_function((path_end_1, EPSILON), new_state)
+        self.add_to_transition_function((path_end_2, EPSILON), new_state)
+
+        # alter accept states
+        self.accepting_states.append(new_state)
+        return new_state
+
+
     def run_nfa(self, input_string: str, current_state: State) -> bool:
         """
         run_nfa                                  <!-- RECURSIVE -->
@@ -117,7 +159,7 @@ class NFA:
         """
 
         # Set up the current state
-        if current_state in self.accepting_states:
+        if current_state in self.accepting_states and input_string is "":
             return True
 
         # Finds all resulting states from epsilon transitions.
