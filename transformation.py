@@ -27,6 +27,7 @@ class Transform:
         """
 
         if regex is None:
+            print('Null regex error')
             return
 
         # Make an NFA and initialize_nfa
@@ -56,10 +57,10 @@ class Transform:
             elif c in RegexChar.operators():
                 if c == RegexChar.UNION.value:
                     self.union_nfa(nfa)
-
                 # apply the operator to the last closed group
-                if self.last_closed_group is None:
+                elif self.last_closed_group is None:
                     # Error in regex
+                    print('Error applying operator: ', c)
                     return
                 else:
                     # apply
@@ -74,6 +75,7 @@ class Transform:
                     nfa = self.concatenate_nfa(nfa, c)
                 else:
                     # error
+                    print('Error reading character')
                     return
 
         # post processing
