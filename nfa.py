@@ -87,7 +87,6 @@ class NFA:
 
         to_delete = []
         r = range(start_state.state_id, end_state.state_id)
-        print('deleted from ', start_state.state_id, ' to state ', end_state.state_id)
 
         for s in self.accepting_states:
             if s.state_id in r:

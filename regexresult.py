@@ -28,9 +28,9 @@ class RegexResult:
             print('Error transforming the NFA!')
             return
 
-        print(nfa_model.transition_function)
-        print(nfa_model.initial_state)
-        print(nfa_model.accepting_states)
+        # print(nfa_model.transition_function)
+        # print(nfa_model.initial_state)
+        # print(nfa_model.accepting_states)
 
         # run tests on NFA
         for test_string in self.test_strings_in_language:
