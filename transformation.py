@@ -65,6 +65,8 @@ class Transform:
                     # apply
                     if c == RegexChar.STAR.value:
                         self.star_nfa(nfa)
+                    elif c == RegexChar.OPTIONAL.value:
+                        self.option_nfa(nfa)
             # build the state
             else:
                 # if alphanumeric, concatenate
@@ -112,26 +114,31 @@ class Transform:
 
         return nfa
 
-    def union_nfa(self, nfa: NFA) -> None:
+    def union_nfa(self, nfa: NFA, unioning_state: State = None) -> None:
         """
         union_nfa
         Add a union from the last open group (or initial state) to existing NFA.
 
         :param nfa: The existing NFA.
+        :param unioning_state: An optional state to union from (otherwise: last open group)
         """
+        if not unioning_state is None:
+            start_union = unioning_state
+        else:
+            start_union = self.open_groups[-1]
 
-        self.union_in_progress.append((self.open_groups[-1], self.last_state))
+        self.union_in_progress.append((start_union, self.last_state))
 
-        if self.open_groups[-1] in nfa.accepting_states:
-            nfa.accepting_states.remove(self.open_groups[-1])
+        if start_union in nfa.accepting_states:
+            nfa.accepting_states.remove(start_union)
 
         # if my open group is at the initial state, make a new state
-        if self.open_groups[-1] == nfa.initial_state:
+        if start_union == nfa.initial_state:
             self.last_state = nfa.replace_initial()
         # otherwise, connect a new epsilon path out of the open group state for the
         # other part of the union
         else:
-            self.last_state = nfa.add_epsilon_connector(self.open_groups[-1])
+            self.last_state = nfa.add_epsilon_connector(start_union)
 
 
 
@@ -162,3 +169,14 @@ class Transform:
 
         # null out the last closed group so it can't be operated on again
         self.last_closed_group = None
+
+    def option_nfa(self, nfa: NFA) -> None:
+        """
+        option_nfa
+        Add an option group of chars (last closed group) to an NFA
+
+        :param nfa: The existing NFA.
+        """
+
+        self.union_nfa(nfa, self.last_closed_group)
+        self.close_union(nfa)
