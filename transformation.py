@@ -15,6 +15,7 @@ class Transform:
         self.open_groups: List[State] = []
         self.last_closed_group: State = None
         self.union_in_progress: List[(State, State)] = []
+        self.last_star: List[State] = []
 
     def transform_to_nfa(self, regex: str) -> NFA:
         """
@@ -62,7 +63,8 @@ class Transform:
                     return
                 else:
                     # apply
-                    pass  # TODO
+                    if c == RegexChar.STAR.value:
+                        self.star_nfa(nfa)
             # build the state
             else:
                 # if alphanumeric, concatenate
@@ -98,8 +100,14 @@ class Transform:
 
         # Connect to to new state on concat_char
         if len(self.union_in_progress) > 0:
+            print('one')
             self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.union_in_progress[-1][1])
+        elif len(self.last_star) > 0:
+            print(1.5)
+            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.last_star[-1])
+            self.last_star = self.last_star[:-1]
         else:
+            print('two')
             self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.open_groups[-1])
 
         return nfa
@@ -137,3 +145,20 @@ class Transform:
         # connect last state of each branch
         self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])
         self.union_in_progress = self.union_in_progress[:-1]
+
+
+    def star_nfa(self, nfa: NFA) -> None:
+        """
+        star_nfa
+        Add a star from the last closed group to existing NFA.
+
+        :param nfa: The existing NFA.
+        """
+        # add star between last closed group and last state
+        self.last_state = nfa.add_star(self.last_closed_group, self.last_state)
+
+        # register this as a star
+        self.last_star.append(self.last_closed_group)
+
+        # null out the last closed group so it can't be operated on again
+        self.last_closed_group = None

@@ -86,7 +86,9 @@ class NFA:
         """
 
         to_delete = []
-        r = range(start_state.state_id + 1, end_state.state_id)
+        r = range(start_state.state_id, end_state.state_id)
+        print('deleted from ', start_state.state_id, ' to state ', end_state.state_id)
+
         for s in self.accepting_states:
             if s.state_id in r:
                 to_delete.append(s)
@@ -147,6 +149,25 @@ class NFA:
         self.accepting_states.append(new_state)
         return new_state
 
+    def add_star(self, start_star: State, end_star: State) -> State:
+        """
+        add_star
+
+        Connect the start and end with epsilon transitions and edit start states to add star
+
+        :return: The new final state
+        """
+        self.add_to_transition_function((end_star, EPSILON), start_star)
+        new_state = State(len(self.states))
+        self.add_to_transition_function((start_star, EPSILON), new_state)
+
+        if not start_star in self.accepting_states:
+            self.accepting_states.append(start_star)
+        if end_star in self.accepting_states:
+            self.accepting_states.remove(end_star)
+        self.accepting_states.append(new_state)
+
+        return new_state
 
     def run_nfa(self, input_string: str, current_state: State) -> bool:
         """
