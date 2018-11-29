@@ -68,6 +68,8 @@ class Transform:
                         self.star_nfa(nfa)
                     elif c == RegexChar.OPTIONAL.value:
                         self.option_nfa(nfa)
+                    elif c == RegexChar.PLUS.value:
+                        self.plus_nfa(nfa)
             # build the state
             else:
                 # if alphanumeric, concatenate
@@ -172,10 +174,26 @@ class Transform:
     def option_nfa(self, nfa: NFA) -> None:
         """
         option_nfa
-        Add an option group of chars (last closed group) to an NFA
+        Add an optional group of chars (last closed group) to an NFA
 
         :param nfa: The existing NFA.
         """
 
         self.union_nfa(nfa, self.last_closed_group)
         self.close_union(nfa)
+
+    def plus_nfa(self, nfa: NFA) -> None:
+        """
+        plus_nfa
+        Add a plus operation on the last closed group of an existing nfa
+
+        :param nfa: The existing NFA.
+        """
+        # add plus between last closed group and last state
+        self.last_state = nfa.add_plus(self.last_closed_group, self.last_state)
+
+        # register this as a star
+        self.last_star.append(self.last_closed_group)
+
+        # null out the last closed group so it can't be operated on again
+        self.last_closed_group = None

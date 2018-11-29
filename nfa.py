@@ -168,6 +168,23 @@ class NFA:
 
         return new_state
 
+    def add_plus(self, start_plus: State, end_plus: State) -> State:
+        """
+        add_plus
+
+        Connect the start and end with epsilon transitions and edit start states to add plus
+
+        :return: The new final state
+        """
+        self.add_to_transition_function((end_plus, EPSILON), start_plus)
+
+        if start_plus in self.accepting_states:
+            self.accepting_states.remove(start_plus)
+        if not end_plus in self.accepting_states:
+            self.accepting_states.append(end_plus)
+
+        return end_plus
+
     def run_nfa(self, input_string: str, current_state: State) -> bool:
         """
         run_nfa                                  <!-- RECURSIVE -->
