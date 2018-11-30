@@ -28,9 +28,22 @@ class TestFileGenerator:
         regex_length = random.randint(1, 20)
 
         non_union_operators = list(set(RegexChar.operators()) - set(RegexChar.UNION.value))
-        # Start with an alphanumeric character.
-        regex: str = random.choice(RegexChar.ALPHANUMERIC.value)
+        # Start with an alphanumeric character or opening group.
+        regex: str = random.choice(RegexChar.ALPHANUMERIC.value + [RegexChar.GROUP.value[0]])
+        num_open_groups = 1 if regex == RegexChar.GROUP.value[0] else 0
         for i in range(regex_length - 1):
+            # 10% chance of adding an opening group.
+            if random.random() <= 0.10:
+                regex += RegexChar.GROUP.value[0]
+                num_open_groups += 1
+                continue
+
+            # 20% chance of closing an open group.
+            if num_open_groups > 0 and random.random() <= 0.20:
+                regex += RegexChar.GROUP.value[-1]
+                num_open_groups -= 1
+                continue
+
             if regex[-1] in non_union_operators:
                 # If the operator isn't a union, a union can follow it.
                 if random.random() < 0.25:
@@ -45,6 +58,9 @@ class TestFileGenerator:
                     regex += random.choice(RegexChar.operators())
             else:
                 regex += random.choice(RegexChar.ALPHANUMERIC.value)
+
+        for _ in range(num_open_groups):
+            regex += RegexChar.GROUP.value[-1]
 
         # Last character of regex cannot be a union.
         if regex.endswith(RegexChar.UNION.value):
