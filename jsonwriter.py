@@ -9,7 +9,8 @@ class JsonWriter:
     Class to write a list of RegexResult objects to the file path output_file_path.
     """
 
-    def create_json_test_input_file(self, regex_list: Dict[str, List[str]]) -> str:
+    def create_json_test_input_file(self, regex_list: Dict[str, List[str]],
+                                    input_file_path: str) -> None:
         json_list = [
             {
                 "regex": regex,
@@ -18,10 +19,8 @@ class JsonWriter:
             for regex in regex_list
         ]
 
-        TEST_INPUT_FILENAME = 'test_input.json'
-        with open(TEST_INPUT_FILENAME, 'w') as file:
+        with open(input_file_path, 'w') as file:
             file.write(json.dumps(json_list))
-        return TEST_INPUT_FILENAME
 
     def write_json_output_file(self, output_file_path: str,
                                regex_result_list: List[RegexResult]) -> None:

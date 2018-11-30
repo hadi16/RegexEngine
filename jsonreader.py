@@ -1,3 +1,4 @@
+import glob
 import json
 from jsonschema import validate, ValidationError
 from regexresult import RegexResult
@@ -17,9 +18,11 @@ class JsonReader:
             self.regex_input_list = []
 
     def _valid_json_input_file(self, input_file_path: str) -> bool:
+        # Recursively find the input schema.
+        schema_filename = list(glob.iglob('**/batch_input_format.schema.json', recursive=True))[0]
         with open(input_file_path, 'r') as regex_file:
             regex_json: List[dict] = json.load(regex_file)
-            with open('batch_input_format.schema.json', 'r') as schema_file:
+            with open(schema_filename, 'r') as schema_file:
                 input_json_schema = json.load(schema_file)
                 try:
                     validate(regex_json, input_json_schema)

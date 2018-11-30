@@ -38,7 +38,7 @@ class TestFileGenerator:
                     continue
 
             if regex[-1] in RegexChar.ALPHANUMERIC.value:
-                # Have an 75% probability of choosing another alphanumeric character.
+                # Have an 80% probability of choosing another alphanumeric character.
                 if random.random() < 0.80:
                     regex += random.choice(RegexChar.ALPHANUMERIC.value)
                 else:

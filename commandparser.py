@@ -14,28 +14,39 @@ from typing import Tuple
               cls=MutuallyExclusiveOption,
               help='JSON input file for batch mode.',
               type=click.Path(exists=True),
-              mutually_exclusive=['regex', 'test-string', 'generate-test-inputs'])
+              mutually_exclusive=['regex', 'test-string',
+                                  'generate-test-input', 'generate-test-output'])
 @click.option('--output-file', '-o',
               cls=MutuallyExclusiveOption,
               help='JSON output file for batch mode.',
               type=click.Path(exists=False),
-              mutually_exclusive=['regex', 'test-string', 'generate-test-inputs'])
+              mutually_exclusive=['regex', 'test-string',
+                                  'generate-test-input', 'generate-test-output'])
 @click.option('--regex', '-r',
               cls=MutuallyExclusiveOption,
               help='Input regular expression for regular mode.',
-              mutually_exclusive=['input-file', 'output-file', 'generate-test-inputs'])
+              mutually_exclusive=['input-file', 'output-file',
+                                  'generate-test-input', 'generate-test-output'])
 @click.option('--test-string', '-s',
               cls=MutuallyExclusiveOption,
               help='Input test string for regular mode.',
-              mutually_exclusive=['input-file', 'output-file', 'generate-test-inputs'],
+              mutually_exclusive=['input-file', 'output-file',
+                                  'generate-test-input', 'generate-test-output'],
               multiple=True)
-@click.option('--generate-tests', '-t',
+@click.option('--generate-tests-input', '-ti',
               cls=MutuallyExclusiveOption,
-              help='Randomly generate tests for the program.',
-              is_flag=True,
-              mutually_exclusive=['input-file', 'output-file', 'regex', 'test-string'])
+              help='Input file to create when randomly generating tests for the program.',
+              type=click.Path(exists=False),
+              mutually_exclusive=['input-file', 'output-file',
+                                  'regex', 'test-string'])
+@click.option('--generate-tests-output', '-to',
+              cls=MutuallyExclusiveOption,
+              help='Ouput file to create when randomly generating tests for the program.',
+              type=click.Path(exists=False),
+              mutually_exclusive=['input-file', 'output-file',
+                                  'regex', 'test-string'])
 def parse_input(input_file: str, output_file: str, regex: str, test_string: Tuple[str],
-                generate_tests: str) -> None:
+                generate_tests_input: str, generate_tests_output: str) -> None:
     """
     parse_input
     Analyze program parameters, report any errors, and route to regular or batch mode as needed.
@@ -46,12 +57,10 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     :param test_string: optional test string.
     """
 
-    if generate_tests:
-        test_generator = TestFileGenerator()
-        regex_test_strings = test_generator.create_random_tests()
-        json_writer = JsonWriter()
-        input_file = json_writer.create_json_test_input_file(regex_test_strings)
-        batch_mode(input_file, 'test_output.json')
+    if generate_tests_input and generate_tests_output:
+        if not generate_tests_input.endswith('.json') or not generate_tests_output.endswith('.json'):
+            raise click.UsageError('Input file and output file must have JSON extension.')
+        generate_tests(generate_tests_input, generate_tests_output)
     # If an input and output files are specified, check for .json file type.
     # Direct to batch mode.
     elif input_file and output_file:
@@ -65,8 +74,18 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
         raise click.UsageError('Illegal usage: input AND output paths required.')
     elif regex or test_string:
         raise click.UsageError('Illegal usage: regex AND test-string required.')
+    elif generate_tests_input or generate_tests_output:
+        raise click.UsageError('Illegal usage: must pass input AND output paths to generate tests.')
     else:
         raise click.UsageError('Illegal usage: must provide command line arguments.')
+
+
+def generate_tests(input_path: str, output_path: str) -> None:
+    test_generator = TestFileGenerator()
+    regex_test_strings = test_generator.create_random_tests()
+    json_writer = JsonWriter()
+    json_writer.create_json_test_input_file(regex_test_strings, input_path)
+    batch_mode(input_path, output_path)
 
 
 def regular_mode(regex: str, test_strings: Tuple[str]) -> None:
