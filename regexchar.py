@@ -4,11 +4,15 @@ from typing import List
 
 
 class RegexChar(Enum):
-    CONCATENATION = [x for x in printable if x.isalnum()]
+    # Operators
     STAR = '*'
     UNION = '|'
     PLUS = '+'
     OPTIONAL = '?'
+
+    # Valid alphanumeric characters
+    ALPHANUMERIC = [x for x in printable if x.isalnum()]
+
     GROUP = '()'
     RANGE = '[-]'
 

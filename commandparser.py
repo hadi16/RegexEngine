@@ -4,6 +4,7 @@ from jsonreader import JsonReader
 from jsonwriter import JsonWriter
 from mutuallyexclusiveoption import MutuallyExclusiveOption
 from regexresult import RegexResult
+from testfilegenerator import TestFileGenerator
 from typing import Tuple
 
 
@@ -13,22 +14,28 @@ from typing import Tuple
               cls=MutuallyExclusiveOption,
               help='JSON input file for batch mode.',
               type=click.Path(exists=True),
-              mutually_exclusive=['regex', 'test-string'])
+              mutually_exclusive=['regex', 'test-string', 'generate-test-inputs'])
 @click.option('--output-file', '-o',
               cls=MutuallyExclusiveOption,
               help='JSON output file for batch mode.',
               type=click.Path(exists=False),
-              mutually_exclusive=['regex', 'test-string'])
+              mutually_exclusive=['regex', 'test-string', 'generate-test-inputs'])
 @click.option('--regex', '-r',
               cls=MutuallyExclusiveOption,
               help='Input regular expression for regular mode.',
-              mutually_exclusive=['input-file', 'output-file'])
+              mutually_exclusive=['input-file', 'output-file', 'generate-test-inputs'])
 @click.option('--test-string', '-s',
               cls=MutuallyExclusiveOption,
               help='Input test string for regular mode.',
-              mutually_exclusive=['input-file', 'output-file'],
+              mutually_exclusive=['input-file', 'output-file', 'generate-test-inputs'],
               multiple=True)
-def parse_input(input_file: str, output_file: str, regex: str, test_string: Tuple[str]) -> None:
+@click.option('--generate-tests', '-t',
+              cls=MutuallyExclusiveOption,
+              help='Randomly generate tests for the program.',
+              is_flag=True,
+              mutually_exclusive=['input-file', 'output-file', 'regex', 'test-string'])
+def parse_input(input_file: str, output_file: str, regex: str, test_string: Tuple[str],
+                generate_tests: str) -> None:
     """
     parse_input
     Analyze program parameters, report any errors, and route to regular or batch mode as needed.
@@ -39,9 +46,15 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     :param test_string: optional test string.
     """
 
+    if generate_tests:
+        test_generator = TestFileGenerator()
+        regex_test_strings = test_generator.create_random_tests()
+        json_writer = JsonWriter()
+        input_file = json_writer.create_json_test_input_file(regex_test_strings)
+        batch_mode(input_file, 'test_output.json')
     # If an input and output files are specified, check for .json file type.
     # Direct to batch mode.
-    if input_file and output_file:
+    elif input_file and output_file:
         if not input_file.endswith('.json') or not output_file.endswith('.json'):
             raise click.UsageError('Input file and output file must have JSON extension.')
         batch_mode(input_file, output_file)
@@ -53,7 +66,7 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     elif regex or test_string:
         raise click.UsageError('Illegal usage: regex AND test-string required.')
     else:
-        raise click.UsageError('Illegal usage: must provide two command line arguments.')
+        raise click.UsageError('Illegal usage: must provide command line arguments.')
 
 
 def regular_mode(regex: str, test_strings: Tuple[str]) -> None:
@@ -89,5 +102,5 @@ def batch_mode(input_file_path: str, output_file_path: str) -> None:
     for test in regex_result_list:
         test.run_test_strings()
     # Write results to the output_file_path
-    json_writer = JsonWriter(output_file_path, regex_result_list)
-    json_writer.write_to_json_file()
+    json_writer = JsonWriter()
+    json_writer.write_json_output_file(output_file_path, regex_result_list)

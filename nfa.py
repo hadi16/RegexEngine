@@ -45,7 +45,8 @@ class NFA:
         else:
             self.transition_function[transition] = [state]
 
-    def add_normal_char(self, old_state: State, transition_char: str, assume_accept: bool=True, start_path_state: State=None) -> State:
+    def add_normal_char(self, old_state: State, transition_char: str, assume_accept: bool=True,
+                        start_path_state: State=None) -> State:
         """
         add_normal_char
         Add necessary states and transitions to connect one state to a new one on some character.
@@ -85,15 +86,10 @@ class NFA:
         :param end_state: The ending state of the path.
         """
 
-        to_delete = []
-        r = range(start_state.state_id, end_state.state_id)
-
-        for s in self.accepting_states:
-            if s.state_id in r:
-                to_delete.append(s)
-
-        for d in to_delete:
-            self.accepting_states.remove(d)
+        states_to_delete = range(start_state.state_id, end_state.state_id)
+        for state in self.accepting_states:
+            if state.state_id in states_to_delete:
+                self.accepting_states.remove(state)
 
     def add_epsilon_connector(self, old_state: State) -> State:
         """
@@ -180,7 +176,7 @@ class NFA:
 
         if start_plus in self.accepting_states:
             self.accepting_states.remove(start_plus)
-        if not end_plus in self.accepting_states:
+        if end_plus not in self.accepting_states:
             self.accepting_states.append(end_plus)
 
         return end_plus

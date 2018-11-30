@@ -9,12 +9,17 @@ class RegexResult:
     Results are stored in a {string => bool} dictionary.
     """
 
-    def __init__(self, regular_expression: str, test_strings: List[str]):
+    def __init__(self, regular_expression: str, test_strings: List[str], test_mode: bool=False):
         self.regular_expression = regular_expression
-        # initialize_nfa the results dictionary as {test_string => None}
-        self.test_strings_in_language: Dict[str, bool] = {
-            test_string: None for test_string in test_strings
-        }
+        if test_mode:
+            self.test_strings_in_language: Dict[str, bool] = {
+                test_string: True for test_string in test_strings
+            }
+        else:
+            # initialize_nfa the results dictionary as {test_string => None}
+            self.test_strings_in_language: Dict[str, bool] = {
+                test_string: None for test_string in test_strings
+            }
 
     def run_test_strings(self) -> None:
         """
