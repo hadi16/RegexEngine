@@ -31,6 +31,7 @@ class NFA:
         initial_state = State(len(self.states))
         self.states.append(initial_state)
         self.initial_state = initial_state
+        self.accepting_states.append(initial_state)
 
     def add_to_transition_function(self, transition: Tuple[State, str], state: State) -> None:
         """
@@ -87,9 +88,18 @@ class NFA:
         """
 
         states_to_delete = range(start_state.state_id, end_state.state_id)
+        # print('deleting accept states in range: ', states_to_delete)
+        # print('accepting states: ', self.accepting_states, '; length: ', len(self.accepting_states))
+        temp_states = self.accepting_states.copy()
+
         for state in self.accepting_states:
+            # print('processing: ', state.state_id)
             if state.state_id in states_to_delete:
-                self.accepting_states.remove(state)
+                # print('removing: ', state.state_id)
+                temp_states.remove(state)
+        self.accepting_states = temp_states
+        # print('resulting accepting states: ', self.accepting_states)
+        # print('---------')
 
     def add_epsilon_connector(self, old_state: State) -> State:
         """
@@ -181,7 +191,7 @@ class NFA:
 
         return end_plus
 
-    def run_nfa(self, input_string: str, current_state: State) -> bool:
+    def run_nfa(self, input_string: str, current_state: State, path= []) -> bool:
         """
         run_nfa                                  <!-- RECURSIVE -->
         Run a string through an NFA.
@@ -190,27 +200,33 @@ class NFA:
         :param current_state: The state to start from.
         :return: True if string was accepted. False otherwise.
         """
-
+        path.append((current_state, input_string))
         # Set up the current state
         if current_state in self.accepting_states and input_string is "":
+            print('accept on path: ', path)
             return True
 
         # Finds all resulting states from epsilon transitions.
         if (current_state, EPSILON) in self.transition_function:
             destinations = self.transition_function[(current_state, EPSILON)]
-            results = [self.run_nfa(input_string, destination) for destination in destinations]
+            results = [self.run_nfa(input_string, destination, path.copy()) for destination in destinations]
             if True in results:
+                print('accept on path: ', path)
                 return True
 
         # Checks if string has been read through.
         if not input_string:
+            print('reject end str on path: ', path)
             return False
 
         # Checks if the transition exists in the transition function.
         if (current_state, input_string[0]) in self.transition_function:
+            # print('continuing on ', current_state, ' ', input_string[0], ' to ', self.transition_function[current_state, input_string[0]])
             destinations = self.transition_function[(current_state, input_string[0])]
-            results = [self.run_nfa(input_string[1:], destination) for destination in destinations]
+            # print('destination: ', destinations)
+            results = [self.run_nfa(input_string[1:], destination, path) for destination in destinations]
             if True in results:
+                print('accept on path: ', path)
                 return True
-
+        print('reject on path is over: ', path)
         return False

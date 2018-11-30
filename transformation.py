@@ -79,8 +79,19 @@ class Transform:
 
         # post processing
         self.last_closed_group = self.open_groups[-1]
-        if self.union_in_progress and self.union_in_progress[-1][0] == self.open_groups[-1]:
-            self.close_union(nfa)
+        # print('final steps')
+        if self.union_in_progress:
+            # print(len(self.union_in_progress))
+             # and self.union_in_progress[-1][0] == self.open_groups[-1]:
+            for union in self.union_in_progress[::-1]:
+                # print('union remaining: ', union)
+                # print('open remaining: ', self.open_groups[-1])
+                # print('last closed group: ', self.last_closed_group)
+                # if union[0] == self.last_closed_group:
+                #     self.close_union(nfa)
+                # elif union[0] == self.open_groups[-1]:
+                #     self.close_union(nfa)
+                self.close_union(nfa)
         self.open_groups = self.open_groups[:-1]
         return nfa
 
@@ -104,9 +115,11 @@ class Transform:
         # Connect to to new state on concat_char
         if self.union_in_progress:
             self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.union_in_progress[-1][1])
+
         elif self.last_star:
             self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.last_star[-1])
             self.last_star = self.last_star[:-1]
+
         else:
             self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.open_groups[-1])
 
@@ -123,6 +136,7 @@ class Transform:
         start_union = unioning_state if unioning_state else self.open_groups[-1]
 
         self.union_in_progress.append((start_union, self.last_state))
+        # print('opening union: ', (start_union, self.last_state))
 
         if start_union in nfa.accepting_states:
             nfa.accepting_states.remove(start_union)
@@ -141,7 +155,7 @@ class Transform:
         Close the last open union by connecting the two halves (from
         self.union_in_progress and self.last_state) to a new state via epsilon
         """
-
+        # print('closing union: ', self.union_in_progress[-1])
         # connect last state of each branch
         self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])
         self.union_in_progress = self.union_in_progress[:-1]
