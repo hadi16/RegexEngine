@@ -103,12 +103,18 @@ class Transform:
 
         # Connect to to new state on concat_char
         if self.union_in_progress:
-            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.union_in_progress[-1][1])
+            self.last_state = nfa.add_normal_char(
+                self.last_state, char_to_concatenate, True, self.union_in_progress[-1][1]
+            )
         elif self.last_star:
-            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.last_star[-1])
+            self.last_state = nfa.add_normal_char(
+                self.last_state, char_to_concatenate, True, self.last_star[-1]
+            )
             self.last_star = self.last_star[:-1]
         else:
-            self.last_state = nfa.add_normal_char(self.last_state, char_to_concatenate, True, self.open_groups[-1])
+            self.last_state = nfa.add_normal_char(
+                self.last_state, char_to_concatenate, True, self.open_groups[-1]
+            )
 
         return nfa
 
