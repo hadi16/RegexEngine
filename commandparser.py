@@ -1,5 +1,6 @@
 import click
 import logging
+import sys
 
 from jsonreader import JsonReader
 from jsonwriter import JsonWriter
@@ -8,7 +9,6 @@ from regexresult import RegexResult
 from testgenerator import TestGenerator
 from testreader import TestReader
 from testwriter import TestWriter
-from sys import stdout
 from typing import List, Tuple
 
 
@@ -58,7 +58,7 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     """
 
     # Sets the logging mode based on the verbose flag.
-    logging.basicConfig(stream=stdout, level=logging.DEBUG if verbose else logging.CRITICAL)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if verbose else logging.CRITICAL)
 
     # If tests flag is enabled, generate positive and negative tests.
     if generate_tests:

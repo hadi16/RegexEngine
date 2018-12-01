@@ -1,4 +1,5 @@
-from json import dumps
+import json
+
 from regexresult import RegexResult
 from typing import List
 
@@ -26,4 +27,4 @@ class JsonWriter:
 
         # Write the list of dictionaries to the JSON file.
         with open(output_file_path, 'w') as file:
-            file.write(dumps(json_list))
+            file.write(json.dumps(json_list))

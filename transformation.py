@@ -1,5 +1,6 @@
-from click import echo
-from logging import debug
+import click
+import logging
+
 from nfa import NFA
 from regexchar import RegexChar
 from state import State
@@ -35,7 +36,7 @@ class Transform:
         """
 
         if not regex:
-            echo('Empty regex error')
+            click.echo('Empty regex error')
             return
 
         # Make an NFA and initialize_nfa
@@ -67,7 +68,7 @@ class Transform:
                 # apply the operator to the last closed group
                 elif self.last_closed_group is None:
                     # Error in regex
-                    echo('Error applying operator: ' + str(char))
+                    click.echo('Error applying operator: ' + str(char))
                     return
                 else:
                     if char == RegexChar.STAR.value:
@@ -82,7 +83,7 @@ class Transform:
                 nfa = self.concatenate_nfa(nfa, char)
             else:
                 # error
-                echo('Error reading character')
+                click.echo('Error reading character')
                 return
 
         # post processing
@@ -142,7 +143,7 @@ class Transform:
         start_union = unioning_state if unioning_state else self.open_groups[-1]
 
         self.union_in_progress.append((start_union, self.last_state))
-        debug('Opening union: ' + str((start_union, self.last_state)))
+        logging.debug('Opening union: ' + str((start_union, self.last_state)))
 
         if start_union in nfa.accepting_states:
             nfa.accepting_states.remove(start_union)
@@ -162,7 +163,7 @@ class Transform:
         (from self.union_in_progress and self.last_state) to a new state via epsilon
         """
 
-        debug('Closing union: ' + str(self.union_in_progress[-1]))
+        logging.debug('Closing union: ' + str(self.union_in_progress[-1]))
 
         # connect last state of each branch
         self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])

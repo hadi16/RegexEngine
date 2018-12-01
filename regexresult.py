@@ -1,5 +1,6 @@
-from click import echo
-from logging import debug
+import click
+import logging
+
 from typing import Dict, List
 from transformation import Transform
 
@@ -48,14 +49,14 @@ class RegexResult:
         # build equivalent NFA
         nfa = Transform().transform_to_nfa(self.regular_expression)
         if nfa is None:
-            echo('Error transforming the NFA!')
+            click.echo('Error transforming the NFA!')
             return
 
-        debug('Transitions: ' + str(nfa.transition_function))
-        debug('Initial state: ' + str(nfa.initial_state))
-        debug('Accepting states: ' + str(nfa.accepting_states))
+        logging.debug('Transitions: ' + str(nfa.transition_function))
+        logging.debug('Initial state: ' + str(nfa.initial_state))
+        logging.debug('Accepting states: ' + str(nfa.accepting_states))
 
         # run tests on NFA
         for test_string in self.test_strings_in_language:
-            debug('Testing string: ' + str(test_string))
+            logging.debug('Testing string: ' + str(test_string))
             self.test_strings_in_language[test_string] = nfa.run_nfa(test_string, nfa.initial_state)

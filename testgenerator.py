@@ -1,8 +1,9 @@
+import random
+import re
+import rstr
+
 from multiprocessing import Pool
-from random import choice, choices, randint, random
-from re import compile
 from regexchar import RegexChar
-from rstr import xeger
 from typing import List, Tuple
 
 
@@ -66,7 +67,7 @@ class TestGenerator:
 
         # Set is to remove duplicate test strings.
         # xeger generates random test strings in a regular expression.
-        test_strings = list({xeger(regex) for _ in range(self.NUM_TEST_STRINGS)})
+        test_strings = list({rstr.xeger(regex) for _ in range(self.NUM_TEST_STRINGS)})
         return [
             test_string for test_string in test_strings
             # Limit length of test strings to prevent max recursion depth from being reached.
@@ -93,7 +94,9 @@ class TestGenerator:
             alphanumeric_regex_elements = RegexChar.ALPHANUMERIC.value
 
         test_strings = list({
-            ''.join(choices(alphanumeric_regex_elements, k=randint(1, self.MAX_TEST_STRING_LENGTH)))
+            ''.join(random.choices(
+                alphanumeric_regex_elements, k=random.randint(1, self.MAX_TEST_STRING_LENGTH)
+            ))
             for _ in range(self.NUM_TEST_STRINGS)
         })
 
@@ -113,7 +116,7 @@ class TestGenerator:
         """
 
         # Add anchors for the beginning and end of line.
-        regex_object = compile(rf'^{regex}$')
+        regex_object = re.compile(rf'^{regex}$')
         return not bool(regex_object.match(test_str))
 
     def _generate_random_regex(self) -> str:
@@ -124,45 +127,45 @@ class TestGenerator:
         :return: A string representing the randomly generated regular expression.
         """
 
-        regex_length = randint(1, 20)
+        regex_length = random.randint(1, 20)
 
         non_union_operators = list(set(RegexChar.operators()) - set(RegexChar.UNION.value))
         # Start with an alphanumeric character or opening group.
-        regex: str = choice(RegexChar.ALPHANUMERIC.value + [RegexChar.GROUP.value[0]])
+        regex: str = random.choice(RegexChar.ALPHANUMERIC.value + [RegexChar.GROUP.value[0]])
         num_open_groups = 1 if regex == RegexChar.GROUP.value[0] else 0
         for i in range(regex_length - 1):
             # 10% chance of adding an opening group.
-            if random() < 0.10:
+            if random.random() < 0.10:
                 regex += RegexChar.GROUP.value[0]
                 num_open_groups += 1
                 continue
 
             # 20% chance of closing an open group.
-            if num_open_groups > 0 and random() <= 0.20:
+            if num_open_groups > 0 and random.random() <= 0.20:
                 regex += RegexChar.GROUP.value[-1]
                 num_open_groups -= 1
                 continue
 
             if regex[-1] in non_union_operators:
                 # If the operator isn't a union, a union can follow it.
-                if random() < 0.25:
+                if random.random() < 0.25:
                     regex += RegexChar.UNION.value
                     continue
 
             if regex[-1] in RegexChar.ALPHANUMERIC.value:
                 # Have an 70% probability of choosing another alphanumeric character.
-                if random() < 0.70:
-                    regex += choice(RegexChar.ALPHANUMERIC.value)
+                if random.random() < 0.70:
+                    regex += random.choice(RegexChar.ALPHANUMERIC.value)
                 else:
-                    regex += choice(RegexChar.operators())
+                    regex += random.choice(RegexChar.operators())
             else:
-                regex += choice(RegexChar.ALPHANUMERIC.value)
+                regex += random.choice(RegexChar.ALPHANUMERIC.value)
 
         for _ in range(num_open_groups):
             regex += RegexChar.GROUP.value[-1]
 
         # Last character of regex cannot be a union.
         if regex.endswith(RegexChar.UNION.value):
-            regex = regex[:-1] + choice(RegexChar.ALPHANUMERIC.value)
+            regex = regex[:-1] + random.choice(RegexChar.ALPHANUMERIC.value)
 
         return regex

@@ -1,3 +1,5 @@
+import os
+
 from jsonwriter import JsonWriter
 from regexresult import RegexResult
 from typing import List, Tuple
@@ -8,6 +10,17 @@ class TestWriter:
     TestWriter
     Class to write the tests. Uses JsonWriter.
     """
+
+    def __init__(self):
+        """
+        __init__
+        Creates a new TestWriter & creates the tests directory.
+        """
+        self.TESTS_DIRECTORY = "tests/"
+
+        # If the directory doesn't exist, create it.
+        if not os.path.exists(self.TESTS_DIRECTORY):
+            os.makedirs(self.TESTS_DIRECTORY)
 
     def get_passed_and_failed_tests(self, tests: List[RegexResult],
                                     positive_tests: bool) -> Tuple[List[RegexResult],
@@ -68,9 +81,15 @@ class TestWriter:
 
         # Write the tests using JsonWriter.
         json_writer = JsonWriter()
-        json_writer.write_json_output_file('tests_positive_all.json', all_positive_tests)
-        json_writer.write_json_output_file('tests_positive_passed.json', passed_tests)
-        json_writer.write_json_output_file('tests_positive_failed.json', failed_tests)
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_positive_all.json', all_positive_tests
+        )
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_positive_passed.json', passed_tests
+        )
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_positive_failed.json', failed_tests
+        )
 
     def write_negative_tests(self, all_negative_tests: List[RegexResult]) -> None:
         """
@@ -84,6 +103,12 @@ class TestWriter:
 
         # Write the tests using JsonWriter.
         json_writer = JsonWriter()
-        json_writer.write_json_output_file('tests_negative_all.json', all_negative_tests)
-        json_writer.write_json_output_file('tests_negative_passed.json', passed_tests)
-        json_writer.write_json_output_file('tests_negative_failed.json', failed_tests)
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_negative_all.json', all_negative_tests
+        )
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_negative_passed.json', passed_tests
+        )
+        json_writer.write_json_output_file(
+            self.TESTS_DIRECTORY + 'tests_negative_failed.json', failed_tests
+        )

@@ -1,7 +1,7 @@
-from click import core, Option, UsageError
+import click
 
 
-class MutuallyExclusiveOption(Option):
+class MutuallyExclusiveOption(click.Option):
     """
     MutuallyExclusiveOption
     Class that inherits from click.Option superclass.
@@ -29,7 +29,7 @@ class MutuallyExclusiveOption(Option):
                     ' NOTE: This argument is mutually exclusive with  arguments: [' + ex_str + '].')
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
-    def handle_parse_result(self, ctx: core.Context, opts: dict, args: list) -> tuple:
+    def handle_parse_result(self, ctx: click.core.Context, opts: dict, args: list) -> tuple:
         """
         handle_parse_result
         Overridden method that handles the parsing from click.
@@ -41,6 +41,6 @@ class MutuallyExclusiveOption(Option):
         """
 
         if self.mutually_exclusive.intersection(opts) and self.name in opts:
-            raise UsageError("Illegal usage: '{}' is mutually exclusive with '{}' options."
-                             .format(self.name, ', '.join(self.mutually_exclusive)))
+            raise click.UsageError("Illegal usage: '{}' is mutually exclusive with '{}' options."
+                                   .format(self.name, ', '.join(self.mutually_exclusive)))
         return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)

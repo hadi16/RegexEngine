@@ -1,5 +1,6 @@
+import string
+
 from enum import Enum
-from string import printable
 from typing import List
 
 
@@ -20,7 +21,7 @@ class RegexChar(Enum):
     GROUP = '()'
 
     # Valid alphanumeric characters
-    ALPHANUMERIC = [x for x in printable if x.isalnum()]
+    ALPHANUMERIC = [x for x in string.printable if x.isalnum()]
 
     @staticmethod
     def operators() -> List[str]:

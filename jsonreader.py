@@ -1,7 +1,8 @@
-from click import echo
-from glob import iglob
-from json import load
-from jsonschema import validate, ValidationError
+import click
+import glob
+import json
+import jsonschema
+
 from regexresult import RegexResult
 from typing import List
 
@@ -37,20 +38,20 @@ class JsonReader:
 
         # Recursively find the input schema file
         # (deals with different execution points for the program).
-        schema_filename = list(iglob('**/batch_input_format.schema.json', recursive=True))[0]
+        schema_filename = list(glob.iglob('**/batch_input_format.schema.json', recursive=True))[0]
         with open(input_file_path, 'r') as regex_file:
             # Load the input file to validate against.
-            regex_json: List[dict] = load(regex_file)
+            regex_json: List[dict] = json.load(regex_file)
             with open(schema_filename, 'r') as schema_file:
                 # Load the JSON schema file.
-                input_json_schema = load(schema_file)
+                input_json_schema = json.load(schema_file)
 
                 # Validate the input JSON file against the schema.
                 try:
-                    validate(regex_json, input_json_schema)
+                    jsonschema.validate(regex_json, input_json_schema)
                     return True
-                except ValidationError as error_message:
-                    echo(error_message)
+                except jsonschema.ValidationError as error_message:
+                    click.echo(error_message)
                     return False
 
     def _read_json_input_file(self, input_file_path: str) -> List[RegexResult]:
@@ -64,7 +65,7 @@ class JsonReader:
 
         # Read the input regex file.
         with open(input_file_path, 'r') as regex_file:
-            regex_json: List[dict] = load(regex_file)
+            regex_json: List[dict] = json.load(regex_file)
 
             # Uses list comprehension to return a list of RegexResult objects.
             return [

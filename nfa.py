@@ -1,4 +1,5 @@
-from logging import debug
+import logging
+
 from state import State
 from typing import Dict, List, Tuple
 
@@ -96,18 +97,19 @@ class NFA:
         """
 
         states_to_delete = range(start_state.state_id, end_state.state_id)
-        debug('Deleting accept states in range: ' + str(states_to_delete))
-        debug(f'Accepting states: {self.accepting_states}; Length: {len(self.accepting_states)}')
+        logging.debug('Deleting accept states in range: ' + str(states_to_delete))
+        logging.debug(f'Accepting states: {self.accepting_states}; ' +
+                      f'Length: {len(self.accepting_states)}')
         temporary_states = self.accepting_states.copy()
 
         for state in self.accepting_states:
-            debug('Processing: ' + str(state.state_id))
+            logging.debug('Processing: ' + str(state.state_id))
             if state.state_id in states_to_delete:
-                debug('Removing: ' + str(state.state_id))
+                logging.debug('Removing: ' + str(state.state_id))
                 temporary_states.remove(state)
         self.accepting_states = temporary_states
-        debug('Resulting accepting states: ' + str(self.accepting_states))
-        debug('---------')
+        logging.debug('Resulting accepting states: ' + str(self.accepting_states))
+        logging.debug('---------')
 
     def add_epsilon_connector(self, old_state: State) -> State:
         """
@@ -219,7 +221,7 @@ class NFA:
 
         # Set up the current state
         if current_state in self.accepting_states and input_string is "":
-            debug('Accept on path: ' + str(path))
+            logging.debug('Accept on path: ' + str(path))
             return True
 
         # Finds all resulting states from epsilon transitions.
@@ -230,30 +232,30 @@ class NFA:
                 for destination in destinations
             ]
             if True in results:
-                debug('accept on path: ' + str(path))
+                logging.debug('accept on path: ' + str(path))
                 return True
 
         # Checks if string has been read through.
         if not input_string:
-            debug('reject end str on path: ' + str(path))
+            logging.debug('reject end str on path: ' + str(path))
             return False
 
         # Checks if the transition exists in the transition function.
         if (current_state, input_string[0]) in self.transition_function:
-            debug(f'Continuing on {current_state} {input_string[0]} to ' +
-                  f'{self.transition_function[current_state, input_string[0]]}')
+            logging.debug(f'Continuing on {current_state} {input_string[0]} to ' +
+                          f'{self.transition_function[current_state, input_string[0]]}')
 
             # Runs through all the resulting states from character transitions.
             destinations = self.transition_function[(current_state, input_string[0])]
-            debug('Destination: ' + str(destinations))
+            logging.debug('Destination: ' + str(destinations))
             results = [
                 self.run_nfa(input_string[1:], destination, path.copy())
                 for destination in destinations
             ]
             if True in results:
-                debug('Accept on path: ' + str(path))
+                logging.debug('Accept on path: ' + str(path))
                 return True
 
         # Otherwise, reject the string.
-        debug('Reject on path is over: ' + str(path))
+        logging.debug('Reject on path is over: ' + str(path))
         return False
