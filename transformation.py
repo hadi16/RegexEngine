@@ -1,7 +1,9 @@
+from click import echo
 from nfa import NFA
 from regexchar import RegexChar
 from state import State
-from typing import List
+from typing import List, Optional
+from verboseprint import verbose_print
 
 
 class Transform:
@@ -17,17 +19,18 @@ class Transform:
         self.union_in_progress: List[(State, State)] = []
         self.last_star: List[State] = []
 
-    def transform_to_nfa(self, regex: str) -> NFA:
+    def transform_to_nfa(self, regex: str) -> Optional[NFA]:
         """
         transform_to_nfa
         Main entry point to convert regex to NFA by parsing through the regex.
+        Returns either the NFA or None if error occurred.
 
         :param regex: The regular expression to convert.
         :return: An equivalent NFA.
         """
 
         if not regex:
-            print('Empty regex error')
+            echo('Empty regex error')
             return
 
         # Make an NFA and initialize_nfa
@@ -44,9 +47,9 @@ class Transform:
         # If I read a character, process it and set it as the last closed group.
         for char in regex:
             # Check if it is a group
-            if char in RegexChar.opening_groups():
+            if char in RegexChar.opening_group():
                 self.open_groups.append(self.last_state)  # TODO : test not causing errors
-            elif char in RegexChar.closing_groups():
+            elif char in RegexChar.closing_group():
                 # close the group
                 self.last_closed_group = self.open_groups[-1]
                 if self.union_in_progress and self.union_in_progress[-1][0] == self.open_groups[-1]:
@@ -59,7 +62,7 @@ class Transform:
                 # apply the operator to the last closed group
                 elif self.last_closed_group is None:
                     # Error in regex
-                    print('Error applying operator: ', char)
+                    echo('Error applying operator: ' + str(char))
                     return
                 else:
                     if char == RegexChar.STAR.value:
@@ -74,24 +77,15 @@ class Transform:
                 nfa = self.concatenate_nfa(nfa, char)
             else:
                 # error
-                print('Error reading character')
+                echo('Error reading character')
                 return
 
         # post processing
         self.last_closed_group = self.open_groups[-1]
-        # print('final steps')
+
         if self.union_in_progress:
-            # print(len(self.union_in_progress))
-             # and self.union_in_progress[-1][0] == self.open_groups[-1]:
-            for union in self.union_in_progress[::-1]:
-                # print('union remaining: ', union)
-                # print('open remaining: ', self.open_groups[-1])
-                # print('last closed group: ', self.last_closed_group)
-                # if union[0] == self.last_closed_group:
-                #     self.close_union(nfa)
-                # elif union[0] == self.open_groups[-1]:
-                #     self.close_union(nfa)
-                self.close_union(nfa)
+            self.close_union(nfa)
+
         self.open_groups = self.open_groups[:-1]
         return nfa
 
@@ -141,26 +135,28 @@ class Transform:
         start_union = unioning_state if unioning_state else self.open_groups[-1]
 
         self.union_in_progress.append((start_union, self.last_state))
-        # print('opening union: ', (start_union, self.last_state))
+        verbose_print('Opening union: ' + str((start_union, self.last_state)))
 
         if start_union in nfa.accepting_states:
             nfa.accepting_states.remove(start_union)
 
-        # if my open group is at the initial state, make a new state
+        # If my open group is at the initial state, make a new state
         if start_union == nfa.initial_state:
             self.last_state = nfa.replace_initial()
-        # otherwise, connect a new epsilon path out of the open group state for the
-        # other part of the union
+        # Otherwise, connect a new epsilon path out of the
+        # open group state for the other part of the union
         else:
             self.last_state = nfa.add_epsilon_connector(start_union)
 
     def close_union(self, nfa: NFA) -> None:
         """
         close_union
-        Close the last open union by connecting the two halves (from
-        self.union_in_progress and self.last_state) to a new state via epsilon
+        Close the last open union by connecting the two halves
+        (from self.union_in_progress and self.last_state) to a new state via epsilon
         """
-        # print('closing union: ', self.union_in_progress[-1])
+
+        verbose_print('Closing union: ' + str(self.union_in_progress[-1]))
+
         # connect last state of each branch
         self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])
         self.union_in_progress = self.union_in_progress[:-1]

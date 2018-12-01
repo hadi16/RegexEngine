@@ -1,41 +1,29 @@
-import json
+from json import dumps
 from regexresult import RegexResult
-from typing import Dict, List
+from typing import List
 
 
 class JsonWriter:
     """
     JsonWriter
-    Class to write a list of RegexResult objects to the file path output_file_path.
+    Writes a list of RegexResult objects to an output file path (JSON output file).
     """
-
-    def create_json_test_input_file(self, regex_list: Dict[str, List[str]],
-                                    input_file_path: str) -> None:
-        json_list = [
-            {
-                "regex": regex,
-                "strings": regex_list[regex]
-            }
-            for regex in regex_list
-        ]
-
-        with open(input_file_path, 'w') as file:
-            file.write(json.dumps(json_list))
 
     def write_json_output_file(self, output_file_path: str,
                                regex_result_list: List[RegexResult]) -> None:
         """
         write_json_output_file
-        Write self._regex_result_list to self._output_file_path.
+        Writes the list of RegexResult objects to the output path.
+
+        :param output_file_path: The output file path (a JSON file).
+        :param regex_result_list: The list of RegexResult objects to write to the file.
         """
 
-        json_list: List[dict] = [
-            {
-                "regex": regex_result.regular_expression,
-                "strings": regex_result.test_strings_in_language
-            }
+        json_list = [
+            regex_result.convert_regex_result_to_json()
             for regex_result in regex_result_list
         ]
 
+        # Write the list of dictionaries to the JSON file.
         with open(output_file_path, 'w') as file:
-            file.write(json.dumps(json_list))
+            file.write(dumps(json_list))

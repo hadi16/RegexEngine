@@ -1,9 +1,13 @@
-import click
+from click import Option, UsageError
 
 
-class MutuallyExclusiveOption(click.Option):
+class MutuallyExclusiveOption(Option):
     """
-    Citation:
+    MutuallyExclusiveOption
+    Class that inherits from click.Option superclass.
+    Prevents the user from using multiple modes (regular, batch, etc.) simultaneously.
+
+    Adapted from:
     https://stackoverflow.com/questions/37310718/
     mutually-exclusive-option-groups-in-python-click?noredirect=1&lq=1
     """
@@ -19,6 +23,6 @@ class MutuallyExclusiveOption(click.Option):
 
     def handle_parse_result(self, ctx, opts, args):
         if self.mutually_exclusive.intersection(opts) and self.name in opts:
-            raise click.UsageError("Illegal usage: '{}' is mutually exclusive with '{}' options."
-                                   .format(self.name, ', '.join(self.mutually_exclusive)))
+            raise UsageError("Illegal usage: '{}' is mutually exclusive with '{}' options."
+                             .format(self.name, ', '.join(self.mutually_exclusive)))
         return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)
