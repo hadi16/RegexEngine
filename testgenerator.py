@@ -7,23 +7,43 @@ from typing import List, Tuple
 
 
 class TestGenerator:
+    """
+    TestGenerator
+    Class that creates all the tests for the program.
+    """
+
     def __init__(self):
+        """
+        __init__
+        Creates a new TestGenerator object. Just sets some class-level constants.
+        """
+
         self.NUM_TEST_STRINGS = 20
         self.MAX_TEST_STRING_LENGTH = 50
 
     def create_tests(self, number_of_regex: int) -> Tuple[dict, dict]:
-        threading_pool = Pool(6)
+        """
+        create_tests
+        Creates the positive and negative tests for the program.
+        Returns as a tuple like this: (positive_tests, negative_tests)
+
+        :param number_of_regex: The number of random regular expressions to create for the tests.
+        :return: (positive_tests, negative_tests)
+        """
 
         # Create different Regular Expressions randomly
         regex_list = [self._generate_random_regex() for _ in range(number_of_regex)]
 
+        # Multiple processes are spawned to make generating the test strings more efficient.
+        threading_pool = Pool(6)
         positive_test_strings = threading_pool.map(self._generate_positive_test_strings, regex_list)
         negative_test_strings = threading_pool.map(self._generate_negative_test_strings, regex_list)
 
+        # The index of the regex_list is mapped to each set of positive or negative test string.
         positive_tests = dict(zip(regex_list, positive_test_strings))
         negative_tests = dict(zip(regex_list, negative_test_strings))
 
-        # Remove empty values (no test strings) in the dictionaries.
+        # Remove empty values (no test strings) in the dictionaries and return.
         return (
             {
                 regex: test_strings
@@ -36,7 +56,16 @@ class TestGenerator:
         )
 
     def _generate_positive_test_strings(self, regex: str) -> List[str]:
+        """
+        _generate_positive_test_strings
+        Creates a list of positive test strings (test strings in the regular expression).
+
+        :param regex: The regular expression to create the strings from.
+        :return: A list of positive test strings.
+        """
+
         # Set is to remove duplicate test strings.
+        # xeger generates random test strings in a regular expression.
         test_strings = list({xeger(regex) for _ in range(self.NUM_TEST_STRINGS)})
         return [
             test_string for test_string in test_strings
@@ -45,6 +74,15 @@ class TestGenerator:
         ]
 
     def _generate_negative_test_strings(self, regex: str) -> List[str]:
+        """
+        _generate_negative_test_strings
+        Creates a list of negative test strings (test strings not in the regular expression).
+
+        :param regex: The regular expression to create the strings from.
+        :return: A list of negative test strings.
+        """
+
+        # Create a list of the alphanumeric elements in the regular expression.
         alphanumeric_regex_elements = list({
             char for char in regex
             if char in RegexChar.ALPHANUMERIC.value
@@ -65,11 +103,27 @@ class TestGenerator:
         ]
 
     def _verify_test_string_not_in_regex(self, regex: str, test_str: str) -> bool:
+        """
+        _verify_test_string_not_in_regex
+        Ensures that the randomly generated regular expression isn't in the regular expression.
+
+        :param regex: The regular expression to test against.
+        :param test_str: The test string.
+        :return: True if not in the regular expression (otherwise False).
+        """
+
         # Add anchors for the beginning and end of line.
         regex_object = compile(rf'^{regex}$')
         return not bool(regex_object.match(test_str))
 
     def _generate_random_regex(self) -> str:
+        """
+        _generate_random_regex
+        Generates a random regular expression.
+
+        :return: A string representing the randomly generated regular expression.
+        """
+
         regex_length = randint(1, 20)
 
         non_union_operators = list(set(RegexChar.operators()) - set(RegexChar.UNION.value))
@@ -86,10 +140,6 @@ class TestGenerator:
             # 20% chance of closing an open group.
             if num_open_groups > 0 and random() <= 0.20:
                 regex += RegexChar.GROUP.value[-1]
-                # TODO: Add back? Get recursion depth errors right now.
-                # Random chance (60%) of adding operator after closing group.
-                # if random.random() < 0.60:
-                #     regex += random.choice(RegexChar.operators())
                 num_open_groups -= 1
                 continue
 

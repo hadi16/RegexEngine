@@ -1,5 +1,5 @@
 import click
-import constants
+import logging
 
 from jsonreader import JsonReader
 from jsonwriter import JsonWriter
@@ -8,6 +8,7 @@ from regexresult import RegexResult
 from testgenerator import TestGenerator
 from testreader import TestReader
 from testwriter import TestWriter
+from sys import stdout
 from typing import List, Tuple
 
 
@@ -34,15 +35,16 @@ from typing import List, Tuple
               multiple=True)
 @click.option('--generate-tests', '-t',
               cls=MutuallyExclusiveOption,
-              help='Input file to create when randomly generating tests for the program.',
-              is_flag=True,
+              help='Create randomly generated tests for the program. '
+                   'Number specified sets the amount of random regular expressions to generate.',
+              type=int,
               mutually_exclusive=['input-file', 'output-file', 'regex', 'test-string'])
 @click.option('--verbose', '-v',
               help='Enable or disable verbose messages to terminal. Defaults to False.',
               is_flag=True,
               default=False)
 def parse_input(input_file: str, output_file: str, regex: str, test_string: Tuple[str],
-                generate_tests: bool, verbose: bool) -> None:
+                generate_tests: int, verbose: bool) -> None:
     """
     parse_input
     Analyze program parameters, report any errors, and route to regular or batch mode as needed.
@@ -51,15 +53,16 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     :param output_file: optional name of output file. Must be .json if included.
     :param regex: optional regex pattern.
     :param test_string: optional test string.
-    :param generate_tests: Flag set to True to generate tests (otherwise False).
+    :param generate_tests: Number of tests to generate for the program (otherwise None).
+    :param verbose: True to display verbose messages to the terminal (otherwise False).
     """
 
-    # Sets the program's verbose flag.
-    constants.VERBOSE = verbose
+    # Sets the logging mode based on the verbose flag.
+    logging.basicConfig(stream=stdout, level=logging.DEBUG if verbose else logging.CRITICAL)
 
     # If tests flag is enabled, generate positive and negative tests.
     if generate_tests:
-        test_mode()
+        test_mode(generate_tests)
 
     # If an input and output files are specified, check for .json file type.
     # Direct to batch mode.
@@ -83,12 +86,20 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
 
 
 def _run_all_test_strings_in_list(regex_result_list: List[RegexResult]) -> None:
+    """
+    _run_all_test_strings_in_list
+    Helper method that runs all of the regular expression & test string pairs
+    in a given list of RegexResult objects.
+
+    :param regex_result_list: The list of RegexResult objects to go through.
+    """
+
     # Run the test strings for each regex.
     for regular_expression in regex_result_list:
         regular_expression.run_test_strings()
 
 
-def test_mode() -> None:
+def test_mode(number_of_regex: int) -> None:
     """
     generate_tests
     In this mode, the program creates an input tests file and executes batch mode on this file.
@@ -97,8 +108,6 @@ def test_mode() -> None:
     # Create the test cases as a dictionary of strings (regex)
     # each mapping to a list of strings (test strings).
     test_generator = TestGenerator()
-    # TODO: Make this variable
-    number_of_regex = 5000
     positive_tests, negative_tests = test_generator.create_tests(number_of_regex)
 
     # Convert the tests to lists of RegexResult objects.
@@ -110,6 +119,7 @@ def test_mode() -> None:
     _run_all_test_strings_in_list(positive_tests)
     _run_all_test_strings_in_list(negative_tests)
 
+    # Write the positive and negative tests.
     test_writer = TestWriter()
     test_writer.write_positive_tests(positive_tests)
     test_writer.write_negative_tests(negative_tests)

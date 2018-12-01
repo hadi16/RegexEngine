@@ -65,15 +65,12 @@ STEPS TO RUN & EXPECTED OUTPUT
   
 6.To get more information on usage, enter: "python RegexEngine --help"
 
-SUPPORTED ELEMENTS & PROGRESS
-- [a-f] All lowercase characters from "a" to "z" : TODO
-- [A-F] All uppercase characters from "A" to "F" : TODO
-- [0-4] All numbers from 0 to 4 : TODO
-- A|B Union : TODO
-- AB Concatenation : TODO
-- A* Star (0 or more copies concatenated together) : TODO
-- A+ Plus (1 or more copies concatenated together) : TODO
-- A? Optional (0 or 1 copies of A) : TODO
+SUPPORTED ELEMENTS
+- A|B Union
+- AB Concatenation
+- A* Star (0 or more copies concatenated together)
+- A+ Plus (1 or more copies concatenated together)
+- A? Optional (0 or 1 copies of A)
 
 COMPONENT FILES & PURPOSE
 - __main__.py

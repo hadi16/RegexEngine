@@ -4,9 +4,23 @@ from typing import List, Tuple
 
 
 class TestWriter:
+    """
+    TestWriter
+    Class to write the tests. Uses JsonWriter.
+    """
+
     def get_passed_and_failed_tests(self, tests: List[RegexResult],
                                     positive_tests: bool) -> Tuple[List[RegexResult],
                                                                    List[RegexResult]]:
+        """
+        get_passed_and_failed_tests
+        Filters the passed and failed tests from a list of all the tests.
+
+        :param tests: The tests to filter.
+        :param positive_tests: True if positive tests are passed (otherwise False).
+        :return: A tuple containing the tests: (passed_tests, failed_tests)
+        """
+
         true_tests = []
         false_tests = []
         for i, regex_result in enumerate(tests):
@@ -36,22 +50,39 @@ class TestWriter:
                     })
                 )
 
+        # If they are positive tests, passing is tests that return True (and converse for negative).
         if positive_tests:
             return true_tests, false_tests
         else:
             return false_tests, true_tests
 
     def write_positive_tests(self, all_positive_tests: List[RegexResult]) -> None:
+        """
+        write_positive_tests
+        Takes list of all the positive tests, filters them out by passed or failed, and writes them.
+
+        :param all_positive_tests: The list of all the positive tests.
+        """
+
         passed_tests, failed_tests = self.get_passed_and_failed_tests(all_positive_tests, True)
 
+        # Write the tests using JsonWriter.
         json_writer = JsonWriter()
         json_writer.write_json_output_file('tests_positive_all.json', all_positive_tests)
         json_writer.write_json_output_file('tests_positive_passed.json', passed_tests)
         json_writer.write_json_output_file('tests_positive_failed.json', failed_tests)
 
     def write_negative_tests(self, all_negative_tests: List[RegexResult]) -> None:
+        """
+        write_negative_tests
+        Takes list of all the negative tests, filters them out by passed or failed, and writes them.
+
+        :param all_negative_tests: The list of all the negative tests.
+        """
+
         passed_tests, failed_tests = self.get_passed_and_failed_tests(all_negative_tests, False)
 
+        # Write the tests using JsonWriter.
         json_writer = JsonWriter()
         json_writer.write_json_output_file('tests_negative_all.json', all_negative_tests)
         json_writer.write_json_output_file('tests_negative_passed.json', passed_tests)

@@ -1,9 +1,9 @@
 from click import echo
+from logging import debug
 from nfa import NFA
 from regexchar import RegexChar
 from state import State
 from typing import List, Optional
-from verboseprint import verbose_print
 
 
 class Transform:
@@ -13,6 +13,11 @@ class Transform:
     """
 
     def __init__(self):
+        """
+        __init__
+        Creates a new Transform object.
+        """
+
         self.last_state: State = None
         self.open_groups: List[State] = []
         self.last_closed_group: State = None
@@ -48,7 +53,7 @@ class Transform:
         for char in regex:
             # Check if it is a group
             if char in RegexChar.opening_group():
-                self.open_groups.append(self.last_state)  # TODO : test not causing errors
+                self.open_groups.append(self.last_state)
             elif char in RegexChar.closing_group():
                 # close the group
                 self.last_closed_group = self.open_groups[-1]
@@ -98,6 +103,7 @@ class Transform:
         :param char_to_concatenate: Character from regex to concatenate.
         :return: The resulting NFA.
         """
+
         # As states are added, update the last state to connect from
         # if this isn't the first char of the regex (only a start state), add an epsilon transition.
         if len(nfa.states) > 1:
@@ -132,10 +138,11 @@ class Transform:
         :param nfa: The existing NFA.
         :param unioning_state: An optional state to union from (otherwise: last open group)
         """
+
         start_union = unioning_state if unioning_state else self.open_groups[-1]
 
         self.union_in_progress.append((start_union, self.last_state))
-        verbose_print('Opening union: ' + str((start_union, self.last_state)))
+        debug('Opening union: ' + str((start_union, self.last_state)))
 
         if start_union in nfa.accepting_states:
             nfa.accepting_states.remove(start_union)
@@ -155,7 +162,7 @@ class Transform:
         (from self.union_in_progress and self.last_state) to a new state via epsilon
         """
 
-        verbose_print('Closing union: ' + str(self.union_in_progress[-1]))
+        debug('Closing union: ' + str(self.union_in_progress[-1]))
 
         # connect last state of each branch
         self.last_state = nfa.close_branch(self.last_state, self.union_in_progress[-1][1])
