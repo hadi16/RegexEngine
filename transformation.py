@@ -58,8 +58,9 @@ class Transform:
             elif char in RegexChar.closing_group():
                 # close the group
                 self.last_closed_group = self.open_groups[-1]
-                if self.union_in_progress and self.union_in_progress[-1][0] == self.open_groups[-1]:
-                    self.close_union(nfa)
+                for union in self.union_in_progress[::-1]:
+                    if union[0] == self.open_groups[-1]:
+                        self.close_union(nfa)
                 self.open_groups = self.open_groups[:-1]
             # check if the char is an operator
             elif char in RegexChar.operators():
@@ -88,10 +89,10 @@ class Transform:
 
         # post processing
         self.last_closed_group = self.open_groups[-1]
-
+        # print('final steps')
         if self.union_in_progress:
-            self.close_union(nfa)
-
+            for union in self.union_in_progress[::-1]:
+                self.close_union(nfa)
         self.open_groups = self.open_groups[:-1]
         return nfa
 
