@@ -109,7 +109,7 @@ SUPPORTED ELEMENTS
 - A? Optional (0 or 1 copies of A)
 
 COMPONENT FILES & PURPOSE
-- __main__.py
+- \_\_main\_\_.py
     This is the main entry point to the program that calls parse_input() to validate parameters and begin parsing as needed.
 - commandparser.py
     This handles the program input: validating usage in parse_input and routing the program to regular mode and batch mode as necessary.
