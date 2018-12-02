@@ -1,15 +1,18 @@
 # RegexEngine
+# authors: Alex Hadi and Chelle Plaisted
 
-
-RegexEngine is an engine to process regular expressions and approve or reject test strings. This is a working document to describe both 
-how to use the engine and working remaining on the project.
+RegexEngine is an engine to process regular expressions and accept or reject test strings.
 
 DEPENDENCIES
-Users must have python3 installed.
-Users must have 'click' installed (for help with the command line portion of the project):
+-python3
+-'click' (for help with the command line portion of the project):
   - on Windows: pip install click
-                or to upgrade
+                or to upgrade:
                 python -m pip install --upgrade pip
+-'rstr' (for help with generating random strings for accept tests):
+  - on Windows: pip install rstr
+-'jsonschema' (for help with validating json formatting in batch mode):
+  - on Windows: pip install jsonschema
 
 STEPS TO RUN & EXPECTED OUTPUT
 1. Clone the project.
@@ -18,7 +21,7 @@ STEPS TO RUN & EXPECTED OUTPUT
   - testPattern : The regular expression you wish to test against.
   - testStr : The string to be checked against the given regular expression.
   - EXPECTED OUTPUT: A line of text output to the terminal structured as follows:
-      "The string 'testStr' is accepted/not accepted by the regular expression 'testPattern.'"
+      "'testStr' accepted by regular expression 'testPattern': False"
 4. To run in batch mode, enter: "python RegexEngine -i inFile.json -o outFile.json"
   - inFile.json : a json file containing regular expressions and test strings formatting as follows:
   [
@@ -57,13 +60,45 @@ STEPS TO RUN & EXPECTED OUTPUT
       ]
     }
   ]
-5. If there is a usage error on running the engine, the user will see an error message i.e.:
+  -NOTE: the file path from the present working directory is needed for the in and output files
+5. If there is a usage error running the engine, the user will see an error message i.e.:
   "Usage: RegexEngine [OPTIONS]
 
   Error: Illegal usage: must provide two command line arguments."
-  Note that other errors are possible.
   
-6.To get more information on usage, enter: "python RegexEngine --help"
+  OR
+  
+  Error reading character
+  Error transforming the NFA!
+  'testString' accepted by regular expression 'testPattern': None
+  
+6. Additional flags and options:
+  Options:
+  -i, --input-file PATH         JSON input file for batch mode. NOTE: This
+                                argument is mutually exclusive with
+                                arguments: [test-string, regex, generate-
+                                tests].
+  -o, --output-file PATH        JSON output file for batch mode. NOTE: This
+                                argument is mutually exclusive with
+                                arguments: [test-string, regex, generate-
+                                tests].
+  -r, --regex TEXT              Input regular expression for regular mode.
+                                NOTE: This argument is mutually exclusive with
+                                arguments: [input-file, generate-tests,
+                                output-file].
+  -s, --test-string TEXT        Input test string for regular mode. NOTE: This
+                                argument is mutually exclusive with
+                                arguments: [input-file, generate-tests,
+                                output-file].
+  -t, --generate-tests INTEGER  Create randomly generated tests for the
+                                program. Number specified sets the amount of
+                                random regular expressions to generate. NOTE:
+                                This argument is mutually exclusive with
+                                arguments: [input-file, regex, output-file,
+                                test-string].
+  -v, --verbose                 Enable or disable verbose messages to
+                                terminal. Defaults to False.
+  --help                        Show this message and exit.
 
 SUPPORTED ELEMENTS
 - A|B Union
@@ -82,10 +117,14 @@ COMPONENT FILES & PURPOSE
 - jsonwriter.py
     Class to write a list of RegexResult objects to the file path output_file_path.
 - mutuallyexclusiveoption.py
-    ???
+    Class to help process command line option dependencies correctly.
 - nfa.py
+    Class to create, edit, and run an NFA.
 - node.py
+    Class specifying a node in an NFA.
 - regexchar.py
+    Class specifying the kinds of regular expression characters handled by the endgine.
 - regexresult.py
     This class defines the results of regex application to a set of strings. Results are stored in a {string => bool} dictionary.
 - transformation.py
+    Class to transform regular expression into an NFA.
