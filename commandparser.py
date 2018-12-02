@@ -58,7 +58,7 @@ def parse_input(input_file: str, output_file: str, regex: str, test_string: Tupl
     """
 
     # Sets the logging mode based on the verbose flag.
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if verbose else logging.CRITICAL)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if verbose else logging.INFO)
 
     # If tests flag is enabled, generate positive and negative tests.
     if generate_tests:
@@ -165,3 +165,6 @@ def batch_mode(input_file_path: str, output_file_path: str) -> None:
 
     # Write results to the output_file_path
     JsonWriter().write_json_output_file(output_file_path, regex_result_list)
+
+    logging.info('Batch mode completed on input file ' + str(input_file_path) +
+                 ' and output file ' + str(output_file_path))

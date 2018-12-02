@@ -1,9 +1,33 @@
 [
     [
         {
-            "regex": "U?(2(z5?))",
+            "regex": "5*v|q|q",
             "strings": {
-                "U": true
+                "5q": true
+            }
+        }
+    ],
+    [
+        {
+            "regex": "8?(H+)I|()",
+            "strings": {
+                "8": true
+            }
+        }
+    ],
+    [
+        {
+            "regex": "z?((Ef(2|)l))",
+            "strings": {
+                "z": true
+            }
+        }
+    ],
+    [
+        {
+            "regex": "8?(k(O?d*|))",
+            "strings": {
+                "8": true
             }
         }
     ]

@@ -1,4 +1,3 @@
-import click
 import logging
 
 from nfa import NFA
@@ -36,7 +35,7 @@ class Transform:
         """
 
         if not regex:
-            click.echo('Empty regex error')
+            logging.critical('Empty regex error')
             return
 
         # Make an NFA and initialize_nfa
@@ -69,7 +68,7 @@ class Transform:
                 # apply the operator to the last closed group
                 elif self.last_closed_group is None:
                     # Error in regex
-                    click.echo('Error applying operator: ' + str(char))
+                    logging.critical('Error applying operator: ' + str(char))
                     return
                 else:
                     if char == RegexChar.STAR.value:
@@ -84,12 +83,11 @@ class Transform:
                 nfa = self.concatenate_nfa(nfa, char)
             else:
                 # error
-                click.echo('Error reading character')
+                logging.critical('Error reading character: ' + str(char))
                 return
 
         # post processing
         self.last_closed_group = self.open_groups[-1]
-        # print('final steps')
         if self.union_in_progress:
             for union in self.union_in_progress[::-1]:
                 self.close_union(nfa)

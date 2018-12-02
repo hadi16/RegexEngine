@@ -1,3 +1,4 @@
+import logging
 import os
 
 from jsonwriter import JsonWriter
@@ -90,6 +91,7 @@ class TestWriter:
         json_writer.write_json_output_file(
             self.TESTS_DIRECTORY + 'tests_positive_failed.json', failed_tests
         )
+        logging.info('Positive tests written to tests directory: ' + str(self.TESTS_DIRECTORY))
 
     def write_negative_tests(self, all_negative_tests: List[RegexResult]) -> None:
         """
@@ -112,3 +114,4 @@ class TestWriter:
         json_writer.write_json_output_file(
             self.TESTS_DIRECTORY + 'tests_negative_failed.json', failed_tests
         )
+        logging.info('Negative tests written to tests directory: ' + str(self.TESTS_DIRECTORY))

@@ -1,7 +1,7 @@
-import click
 import glob
 import json
 import jsonschema
+import logging
 
 from regexresult import RegexResult
 from typing import List
@@ -51,7 +51,7 @@ class JsonReader:
                     jsonschema.validate(regex_json, input_json_schema)
                     return True
                 except jsonschema.ValidationError as error_message:
-                    click.echo(error_message)
+                    logging.critical(error_message)
                     return False
 
     def _read_json_input_file(self, input_file_path: str) -> List[RegexResult]:

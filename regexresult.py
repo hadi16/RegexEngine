@@ -1,4 +1,3 @@
-import click
 import logging
 
 from typing import Dict, List
@@ -49,7 +48,7 @@ class RegexResult:
         # build equivalent NFA
         nfa = Transform().transform_to_nfa(self.regular_expression)
         if nfa is None:
-            click.echo('Error transforming the NFA!')
+            logging.critical('Error transforming the NFA!')
             return
 
         logging.debug('Transitions: ' + str(nfa.transition_function))

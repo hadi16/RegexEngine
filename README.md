@@ -1,22 +1,23 @@
 # RegexEngine
-# authors: Alex Hadi and Chelle Plaisted
+# Authors: Alex Hadi and Chelle Plaisted
 
 RegexEngine is an engine to process regular expressions and accept or reject test strings.
 
 DEPENDENCIES
--python3
+-Python 3.6.0 or later (required for f-strings)
 -'click' (for help with the command line portion of the project):
   - on Windows: pip install click
-                or to upgrade:
-                python -m pip install --upgrade pip
+  - on macOS: pip3 install click
 -'rstr' (for help with generating random strings for accept tests):
   - on Windows: pip install rstr
+  - on macOS: pip3 install rstr
 -'jsonschema' (for help with validating json formatting in batch mode):
   - on Windows: pip install jsonschema
+  - on macOS: pip3 install jsonschema
 
 STEPS TO RUN & EXPECTED OUTPUT
 1. Clone the project.
-2. Navigate to the RegexEngine folder.
+2. Navigate to the directory containing the RegexEngine folder (or folder that contains the code).
 3. To run in regular mode, enter: "python RegexEngine -r testPattern -s testStr"
   - testPattern : The regular expression you wish to test against.
   - testStr : The string to be checked against the given regular expression.
@@ -111,20 +112,26 @@ COMPONENT FILES & PURPOSE
 - __main__.py
     This is the main entry point to the program that calls parse_input() to validate parameters and begin parsing as needed.
 - commandparser.py
-    This handles the program input: valdiating usage in parse_input and routing the program to regular mode and batch mode as necessary.
+    This handles the program input: validating usage in parse_input and routing the program to regular mode and batch mode as necessary.
 - jsonreader.py
-    Class to read an input json file into a list of RegexResult objects.
+    Class JsonReader to read an input json file into a list of RegexResult objects.
 - jsonwriter.py
-    Class to write a list of RegexResult objects to the file path output_file_path.
+    Class JsonWriter to write a list of RegexResult objects to the file path output_file_path.
 - mutuallyexclusiveoption.py
-    Class to help process command line option dependencies correctly.
+    Class MutuallyExclusiveOption to ensure that the user does not attempt to use multiple modes simultaneously.
 - nfa.py
-    Class to create, edit, and run an NFA.
-- node.py
-    Class specifying a node in an NFA.
+    Class NFA to create, edit, and run an NFA.
 - regexchar.py
-    Class specifying the kinds of regular expression characters handled by the endgine.
+    Enumeration class RegexChar specifying the kinds of regular expression characters handled by the engine.
 - regexresult.py
-    This class defines the results of regex application to a set of strings. Results are stored in a {string => bool} dictionary.
+    Class RegexResult defines the results of regex application to a set of strings. Results are stored in a {string => bool} dictionary.
+- state.py
+    Class State specifies a node in an NFA.
+- testgenerator.py
+    Class TestGenerator creates randomly generated positive and negative tests for the engine.
+- testreader.py
+    Class TestReader reads all the test cases and converts them to RegexResult objects.
+- testwriter.py
+    Class TestWriter writes all the tests to JSON files using JsonWriter.
 - transformation.py
-    Class to transform regular expression into an NFA.
+    Class Transformation to transform regular expression into an NFA.
