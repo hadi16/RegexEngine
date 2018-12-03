@@ -1,34 +1,14 @@
 [
-    [
-        {
-            "regex": "5*v|q|q",
-            "strings": {
-                "5q": true
-            }
+    {
+        "regex": "h+8U|V|()",
+        "strings": {
+            "hh": true
         }
-    ],
-    [
-        {
-            "regex": "8?(H+)I|()",
-            "strings": {
-                "8": true
-            }
+    },
+    {
+        "regex": "G?(4()6jLsc5IWVT)",
+        "strings": {
+            "G": true
         }
-    ],
-    [
-        {
-            "regex": "z?((Ef(2|)l))",
-            "strings": {
-                "z": true
-            }
-        }
-    ],
-    [
-        {
-            "regex": "8?(k(O?d*|))",
-            "strings": {
-                "8": true
-            }
-        }
-    ]
+    }
 ]

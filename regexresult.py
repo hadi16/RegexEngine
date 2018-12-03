@@ -1,6 +1,6 @@
 import logging
 
-from typing import Dict, List
+from typing import Dict
 from transformation import Transform
 
 
@@ -23,21 +23,19 @@ class RegexResult:
         self.regular_expression = regular_expression
         self.test_strings_in_language = test_strings_in_language
 
-    def convert_regex_result_to_json(self) -> List[dict]:
+    def convert_regex_result_to_json(self) -> dict:
         """
         convert_regex_result_to_json
-        Returns a list of dictionaries representing a list of JSON objects.
+        Returns a dictionary representing a JSON object.
 
-        :return: A list of dictionaries that represent the JSON to write.
+        :return: A dictionary that represents the JSON to write.
         """
 
-        # Return a list of dictionaries that represent the list of objects in the JSON.
-        return [
-            {
-                "regex": self.regular_expression,
-                "strings": self.test_strings_in_language
-            }
-        ]
+        # Return a dictionary that represents an object in the JSON.
+        return {
+            "regex": self.regular_expression,
+            "strings": self.test_strings_in_language
+        }
 
     def run_test_strings(self) -> None:
         """
