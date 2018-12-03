@@ -70,6 +70,41 @@ class TestWriter:
         else:
             return false_tests, true_tests
 
+    def get_tests_summary(self, passed_tests: List[RegexResult],
+                          failed_tests: List[RegexResult]) -> Tuple[int, int]:
+        """
+        get_tests_summary
+        Returns the number of passed and failed tests as (number_passed, number_failed)
+
+        :param passed_tests: The list of passed tests to check.
+        :param failed_tests: The list of failed tests to check.
+        :return: (number_passed, number_failed)
+        """
+
+        number_passed = sum(
+            len(test.test_strings_in_language.values()) for test in passed_tests
+        )
+        number_failed = sum(
+            len(test.test_strings_in_language.values()) for test in failed_tests
+        )
+        return number_passed, number_failed
+
+    def write_tests_summary(self, output_file_path: str,
+                            number_passed: int, number_failed: int) -> None:
+        """
+        write_tests_summary
+        Writes the summary for all the passed and failed tests to a text file.
+
+        :param output_file_path: The file path to write to.
+        :param number_passed: The number of passed tests.
+        :param number_failed: The number of failed tests.
+        """
+
+        with open(self.TESTS_DIRECTORY + output_file_path, 'w') as file:
+            file.write(f'Tests total: {number_passed+number_failed}\n')
+            file.write(f'Tests passed: {number_passed}\n')
+            file.write(f'Tests failed: {number_failed}\n')
+
     def write_positive_tests(self, all_positive_tests: List[RegexResult]) -> None:
         """
         write_positive_tests
@@ -91,6 +126,11 @@ class TestWriter:
         json_writer.write_json_output_file(
             self.TESTS_DIRECTORY + 'tests_positive_failed.json', failed_tests
         )
+
+        # Write the tests summary.
+        number_passed, number_failed = self.get_tests_summary(passed_tests, failed_tests)
+        self.write_tests_summary('tests_positive_summary.txt', number_passed, number_failed)
+
         logging.info('Positive tests written to tests directory: ' + str(self.TESTS_DIRECTORY))
 
     def write_negative_tests(self, all_negative_tests: List[RegexResult]) -> None:
@@ -114,4 +154,9 @@ class TestWriter:
         json_writer.write_json_output_file(
             self.TESTS_DIRECTORY + 'tests_negative_failed.json', failed_tests
         )
+
+        # Write the tests summary.
+        number_passed, number_failed = self.get_tests_summary(passed_tests, failed_tests)
+        self.write_tests_summary('tests_negative_summary.txt', number_passed, number_failed)
+
         logging.info('Negative tests written to tests directory: ' + str(self.TESTS_DIRECTORY))

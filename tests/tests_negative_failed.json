@@ -1,14 +1,1 @@
-[
-    {
-        "regex": "h+8U|V|()",
-        "strings": {
-            "hh": true
-        }
-    },
-    {
-        "regex": "G?(4()6jLsc5IWVT)",
-        "strings": {
-            "G": true
-        }
-    }
-]
+[]
