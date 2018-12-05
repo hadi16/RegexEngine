@@ -160,6 +160,10 @@ def batch_mode(input_file_path: str, output_file_path: str) -> None:
     # read the input file and get an object representation of it.
     regex_result_list = JsonReader(input_file_path).regex_input_list
 
+    if not regex_result_list:
+        logging.critical(f'Batch mode failed: {input_file_path} in improper format.')
+        return
+
     # Run all test strings.
     _run_all_test_strings_in_list(regex_result_list)
 

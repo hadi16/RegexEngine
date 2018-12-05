@@ -27,4 +27,4 @@ class JsonWriter:
 
         # Write the list of dictionaries to the JSON file.
         with open(output_file_path, 'w') as file:
-            file.write(json.dumps(json_list))
+            json.dump(json_list, file, indent=4)
